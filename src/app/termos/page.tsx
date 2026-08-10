@@ -8,16 +8,16 @@ export default function TermosPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
       <h1 className="font-display text-3xl uppercase tracking-wide text-paper">Termos de Uso</h1>
-      <p className="mt-2 text-sm text-muted">Última atualização: [DATA]</p>
+      <p className="mt-2 text-sm text-muted">Última atualização: 10/08/2026</p>
 
       <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted">
         <section>
           <h2 className="mb-2 text-base font-semibold text-paper">1. Quem somos</h2>
           <p>
-            A Loja de Camisas é operada por <strong className="text-paper">[NOME COMPLETO]</strong>,
-            CPF <strong className="text-paper">[CPF]</strong>, com sede em{" "}
-            <strong className="text-paper">[CIDADE/UF]</strong>. Para contato, use{" "}
-            <strong className="text-paper">[E-MAIL OU WHATSAPP DE CONTATO]</strong>.
+            A Loja de Camisas é operada por <strong className="text-paper">Victor Rodrigues Esteves</strong>,
+            CPF <strong className="text-paper">499.892.238-66</strong>, com sede em{" "}
+            <strong className="text-paper">Santos/SP</strong>. Para contato, use{" "}
+            <strong className="text-paper">WhatsApp (13) 99174-9391 ou Instagram @lv.sports013</strong>.
           </p>
         </section>
 

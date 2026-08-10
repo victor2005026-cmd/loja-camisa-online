@@ -75,9 +75,60 @@ Em **Authentication → URL Configuration**, adicione:
 Não precisa criar tabela de perfil: nome, e-mail e avatar do usuário vêm
 automaticamente do Google em `user.user_metadata` (`full_name`, `avatar_url`, `email`).
 
+### 2.4 Publicar o app OAuth (liberar login pra qualquer cliente)
+
+Enquanto o app estiver em modo **Testing** no Google Cloud, só e-mails
+cadastrados como **Test user** conseguem logar. Pra liberar geral:
+
+1. **APIs & Services → OAuth consent screen**
+2. Preencha (se ainda não tiver) **Application home page**, **Privacy policy
+   link** (`https://sua-loja.vercel.app/privacidade`) e **Terms of service
+   link** (`.../termos`)
+3. Clique em **Publish App**
+
+Como o app só pede escopos básicos (nome, e-mail, foto), o Google libera na
+hora — não precisa de revisão manual.
+
 ---
 
-## 3. Configurar o Mercado Pago (modo de teste)
+## 3. Login com e-mail e senha (alternativa ao Google)
+
+Além do Google, a loja também aceita cadastro/login com e-mail e senha
+(`/cadastro`, `/entrar`, `/recuperar-senha`, `/redefinir-senha`), com
+confirmação por e-mail obrigatória antes do primeiro login.
+
+### 3.1 Conferir que a confirmação de e-mail está ativa
+
+**Authentication → Sign In / Providers → Email** → confirme que **Confirm
+email** está ativado (é o padrão em projetos novos). Sem isso, qualquer
+e-mail entraria sem confirmar nada.
+
+### 3.2 Apontar os e-mails de confirmação pra rota da loja
+
+Por padrão, o link desses e-mails leva pro servidor do Supabase, não pro seu
+site. Para os links funcionarem com a rota `/auth/confirm` já implementada no
+projeto (que confirma o cadastro **e** já verifica se falta completar o
+perfil), edite dois templates em **Authentication → Email Templates**:
+
+**Confirm signup** — troque o link por:
+```html
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Confirmar e-mail</a>
+```
+
+**Reset Password** — troque o link por:
+```html
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery">Redefinir senha</a>
+```
+
+### 3.3 Redirect URLs
+
+Em **Authentication → URL Configuration → Redirect URLs**, garanta que
+`http://localhost:3000/auth/confirm` (e depois a URL de produção) também
+esteja na lista, junto com a de `/auth/callback`.
+
+---
+
+## 4. Configurar o Mercado Pago (modo de teste)
 
 1. Acesse [mercadopago.com.br/developers/panel](https://www.mercadopago.com.br/developers/panel) e faça login com sua conta Mercado Pago (ou crie uma).
 2. **Suas integrações → Criar aplicação**. Escolha "Pagamentos online" / "CheckoutPro".
@@ -93,7 +144,7 @@ automaticamente do Google em `user.user_metadata` (`full_name`, `avatar_url`, `e
    — por exemplo, um cartão de teste de crédito com CVV `123` e nome do titular
    `APRO` para aprovação automática.
 
-### 3.1 O webhook precisa de uma URL pública mesmo em desenvolvimento
+### 4.1 O webhook precisa de uma URL pública mesmo em desenvolvimento
 
 O Mercado Pago envia a confirmação de pagamento via HTTP POST para
 `NEXT_PUBLIC_SITE_URL/api/mercadopago/webhook`. Isso significa que
@@ -115,7 +166,7 @@ muda para `pago`.
 
 ---
 
-## 4. Rodando localmente
+## 5. Rodando localmente
 
 ```bash
 npm install
@@ -126,7 +177,7 @@ npm run dev
 
 Abra [http://localhost:3000](http://localhost:3000).
 
-### 4.1 Testando uma compra de ponta a ponta
+### 5.1 Testando uma compra de ponta a ponta
 
 1. Clique em **Entrar com Google** e faça login (use uma conta real do
    Google — o login é normal, só o pagamento é que é em modo teste).
@@ -151,7 +202,7 @@ pago não confere, pedido não encontrado, etc).
 
 ---
 
-## 5. Indo para produção (quando tiver CPF/CNPJ vinculado ao Mercado Pago)
+## 6. Indo para produção (quando tiver CPF/CNPJ vinculado ao Mercado Pago)
 
 1. Na sua aplicação em **developers.mercadopago.com/panel**, complete a
    ativação de produção (vincula CPF/CNPJ e dados bancários).
@@ -168,7 +219,7 @@ pago não confere, pedido não encontrado, etc).
 
 ---
 
-## 6. Deploy na Vercel
+## 7. Deploy na Vercel
 
 1. Suba este projeto para um repositório Git (GitHub/GitLab/Bitbucket).
 2. Em [vercel.com/new](https://vercel.com/new), importe o repositório.
@@ -186,8 +237,9 @@ pago não confere, pedido não encontrado, etc).
 
 4. Deploy. Depois do primeiro deploy, copie a URL gerada pela Vercel e:
    - Atualize `NEXT_PUBLIC_SITE_URL` com essa URL (e faça redeploy).
-   - Adicione `https://sua-loja.vercel.app/auth/callback` nas **Redirect URLs**
-     do Supabase (passo 2.3).
+   - Adicione `https://sua-loja.vercel.app/auth/callback` e
+     `https://sua-loja.vercel.app/auth/confirm` nas **Redirect URLs** do
+     Supabase (passos 2.3 e 3.3).
    - Adicione a mesma URL como **Authorized redirect URI** só se o Supabase
      pedir uma nova (normalmente não precisa, o redirect fica todo no domínio
      do Supabase).
@@ -198,7 +250,7 @@ ngrok em produção.
 
 ---
 
-## 7. Painel de administração (`/admin`)
+## 8. Painel de administração (`/admin`)
 
 Tela restrita pra você (dono da loja) cadastrar/editar produtos e ver os
 pedidos recebidos. Não aparece nenhum link pra ela na navegação pública —
@@ -252,30 +304,44 @@ ação — a proteção não depende só da tela não ter link visível.
 ```
 src/
   app/
-    page.tsx                     # catálogo público (home)
-    produto/[id]/page.tsx        # detalhe do produto + seleção de tamanho
+    page.tsx                     # catálogo público (home, filtro por categoria)
+    produto/[id]/page.tsx        # detalhe do produto + galeria + seleção de tamanho
     carrinho/page.tsx            # carrinho + botão de checkout
     pedidos/page.tsx             # "Meus pedidos" (autenticado)
+    completar-cadastro/          # telefone + endereço obrigatórios antes de comprar
+    entrar/page.tsx              # login com e-mail/senha (+ Google)
+    cadastro/page.tsx            # criar conta com e-mail/senha
+    recuperar-senha/page.tsx     # pedir link de redefinição de senha
+    redefinir-senha/page.tsx     # definir nova senha (via link do e-mail)
+    termos/page.tsx              # Termos de Uso
+    privacidade/page.tsx         # Política de Privacidade (LGPD)
     auth/callback/route.ts       # callback do OAuth do Google
+    auth/confirm/route.ts        # confirma e-mail (cadastro) e recuperação de senha
     api/checkout/route.ts        # cria pedido + preferência Mercado Pago
     api/mercadopago/webhook/route.ts  # confirma pagamento, abate estoque
     admin/                        # painel restrito (ADMIN_EMAILS)
       layout.tsx                  # protege todas as rotas /admin
       produtos/page.tsx           # lista + ativar/desativar produto
       produtos/novo/page.tsx      # criar produto
-      produtos/[id]/page.tsx      # editar produto + estoque por tamanho
+      produtos/[id]/page.tsx      # editar produto + estoque por tamanho + fotos
       produtos/actions.ts         # server actions (service_role)
-      pedidos/page.tsx            # lista de todos os pedidos
+      pedidos/page.tsx            # lista de todos os pedidos + dados de entrega
   components/
-    Header.tsx, GoogleLoginButton.tsx
+    Header.tsx, Footer.tsx, GoogleLoginButton.tsx, ShirtPlaceholder.tsx
   lib/
     supabase/client.ts           # client Supabase p/ browser
     supabase/server.ts           # client Supabase p/ Server Components (RLS)
     supabase/admin.ts            # client com service_role (só em rotas de API)
+    supabase/storage.ts          # upload/remoção de fotos no bucket camisas-fotos
     cart-store.ts                # carrinho (zustand + localStorage)
+    admin-auth.ts                # checa ADMIN_EMAILS no servidor
     types.ts
   proxy.ts                       # mantém a sessão do Supabase sincronizada
-supabase/migrations/0001_init.sql
+supabase/migrations/
+  0001_init.sql                  # camisas, pedidos, pedido_itens, RLS
+  0002_categorias_e_demo.sql     # categorias do catálogo
+  0003_perfis_e_entrega.sql      # perfis (telefone/endereço) + snapshot de entrega
+  0004_camisa_fotos.sql          # galeria de fotos por produto
 ```
 
 ## Scripts

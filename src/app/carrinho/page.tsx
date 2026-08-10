@@ -139,8 +139,11 @@ export default function CarrinhoPage() {
           </button>
         ) : (
           <div className="space-y-2 text-center">
-            <p className="text-sm text-muted">Entre com sua conta Google para finalizar a compra.</p>
+            <p className="text-sm text-muted">Entre pra finalizar a compra.</p>
             <GoogleLoginButton className="mx-auto flex items-center justify-center gap-2 rounded-lg border border-line bg-surface px-4 py-2 text-sm font-medium text-paper shadow-sm hover:border-muted" />
+            <Link href="/entrar?next=/carrinho" className="block text-xs text-muted hover:text-paper">
+              ou entrar com e-mail
+            </Link>
           </div>
         )}
       </div>

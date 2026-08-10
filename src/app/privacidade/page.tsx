@@ -10,7 +10,7 @@ export default function PrivacidadePage() {
       <h1 className="font-display text-3xl uppercase tracking-wide text-paper">
         Política de Privacidade
       </h1>
-      <p className="mt-2 text-sm text-muted">Última atualização: [DATA]</p>
+      <p className="mt-2 text-sm text-muted">Última atualização: 10/08/2026</p>
 
       <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted">
         <section>
@@ -18,9 +18,9 @@ export default function PrivacidadePage() {
             Esta página explica quais dados a Loja de Camisas coleta, pra que servem e com quem
             são compartilhados, conforme a Lei Geral de Proteção de Dados (LGPD). O responsável
             pelo tratamento dos seus dados é{" "}
-            <strong className="text-paper">[NOME COMPLETO]</strong>, CPF{" "}
-            <strong className="text-paper">[CPF]</strong>. Dúvidas ou pedidos sobre seus dados:{" "}
-            <strong className="text-paper">[E-MAIL OU WHATSAPP DE CONTATO]</strong>.
+            <strong className="text-paper">Victor Rodrigues Esteves</strong>, CPF{" "}
+            <strong className="text-paper">499.892.238-66</strong>. Dúvidas ou pedidos sobre seus dados:{" "}
+            <strong className="text-paper">WhatsApp (13) 99174-9391 ou Instagram @lv.sports013</strong>.
           </p>
         </section>
 

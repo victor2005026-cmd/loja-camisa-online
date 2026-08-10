@@ -64,7 +64,12 @@ export function Header() {
               </button>
             </div>
           ) : (
-            <GoogleLoginButton className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-paper hover:border-muted" />
+            <div className="flex items-center gap-2">
+              <GoogleLoginButton className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-paper hover:border-muted" />
+              <Link href="/entrar" className="text-sm font-medium text-muted hover:text-paper">
+                E-mail
+              </Link>
+            </div>
           )}
         </div>
       </div>

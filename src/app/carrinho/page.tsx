@@ -1,13 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { useCartStore } from "@/lib/cart-store";
 import { GoogleLoginButton } from "@/components/GoogleLoginButton";
+import { ShirtPlaceholder } from "@/components/ShirtPlaceholder";
 
 export default function CarrinhoPage() {
+  const router = useRouter();
   const { items, updateQuantidade, removeItem, total } = useCartStore();
   const [user, setUser] = useState<User | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
@@ -41,6 +44,10 @@ export default function CarrinhoPage() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.redirectTo) {
+          router.push(`${data.redirectTo}?next=${encodeURIComponent("/carrinho")}`);
+          return;
+        }
         setErro(data.error ?? "Não foi possível iniciar o pagamento.");
         setLoading(false);
         return;
@@ -55,9 +62,9 @@ export default function CarrinhoPage() {
 
   if (items.length === 0) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-12 text-center">
-        <p className="text-gray-500">Seu carrinho está vazio.</p>
-        <Link href="/" className="mt-4 inline-block font-medium text-black underline">
+      <div className="mx-auto max-w-4xl px-4 py-12 text-center">
+        <p className="text-muted">Seu carrinho está vazio.</p>
+        <Link href="/" className="mt-4 inline-block font-medium text-flare underline">
           Ver catálogo
         </Link>
       </div>
@@ -65,26 +72,28 @@ export default function CarrinhoPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold">Carrinho</h1>
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+      <h1 className="mb-6 font-display text-2xl uppercase tracking-wide text-paper">Carrinho</h1>
 
       <div className="space-y-4">
         {items.map((item) => (
           <div
             key={`${item.camisaId}-${item.tamanho}`}
-            className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4"
+            className="flex items-center gap-4 rounded-xl border border-line bg-surface p-4"
           >
-            <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
-              {item.fotoUrl && (
+            <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
+              {item.fotoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={item.fotoUrl} alt={item.modelo} className="h-full w-full object-cover" />
+              ) : (
+                <ShirtPlaceholder categoria="" />
               )}
             </div>
 
             <div className="flex-1">
-              <p className="text-sm font-semibold text-gray-900">{item.modelo}</p>
-              <p className="text-xs text-gray-500">Tamanho: {item.tamanho}</p>
-              <p className="text-sm font-medium text-gray-900">
+              <p className="text-sm font-medium text-paper">{item.modelo}</p>
+              <p className="text-xs text-muted">Tamanho: {item.tamanho}</p>
+              <p className="font-display text-base text-flare">
                 {item.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
               </p>
             </div>
@@ -97,12 +106,12 @@ export default function CarrinhoPage() {
               onChange={(e) =>
                 updateQuantidade(item.camisaId, item.tamanho, Number(e.target.value))
               }
-              className="w-16 rounded-lg border border-gray-300 px-2 py-1 text-sm"
+              className="w-16 rounded-lg border border-line bg-ink px-2 py-1 text-sm text-paper"
             />
 
             <button
               onClick={() => removeItem(item.camisaId, item.tamanho)}
-              className="text-sm text-red-500 hover:text-red-700"
+              className="text-sm text-red-400 hover:text-red-300"
             >
               Remover
             </button>
@@ -110,28 +119,28 @@ export default function CarrinhoPage() {
         ))}
       </div>
 
-      <div className="mt-6 flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4">
-        <span className="text-sm font-medium text-gray-700">Total</span>
-        <span className="text-xl font-bold text-gray-900">
+      <div className="mt-6 flex items-center justify-between rounded-xl border border-line bg-surface p-4">
+        <span className="text-sm font-medium text-muted">Total</span>
+        <span className="font-display text-2xl text-flare">
           {total().toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
         </span>
       </div>
 
-      {erro && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{erro}</p>}
+      {erro && <p className="mt-4 rounded-lg bg-red-950 p-3 text-sm text-red-300">{erro}</p>}
 
       <div className="mt-6">
         {loadingUser ? null : user ? (
           <button
             onClick={handleCheckout}
             disabled={loading}
-            className="w-full rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+            className="w-full rounded-lg bg-flare px-5 py-3 text-sm font-semibold text-ink hover:brightness-110 disabled:opacity-50"
           >
             {loading ? "Redirecionando para pagamento..." : "Finalizar compra"}
           </button>
         ) : (
           <div className="space-y-2 text-center">
-            <p className="text-sm text-gray-600">Entre com sua conta Google para finalizar a compra.</p>
-            <GoogleLoginButton className="mx-auto flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50" />
+            <p className="text-sm text-muted">Entre com sua conta Google para finalizar a compra.</p>
+            <GoogleLoginButton className="mx-auto flex items-center justify-center gap-2 rounded-lg border border-line bg-surface px-4 py-2 text-sm font-medium text-paper shadow-sm hover:border-muted" />
           </div>
         )}
       </div>

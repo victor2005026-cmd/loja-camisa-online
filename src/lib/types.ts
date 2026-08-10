@@ -1,5 +1,38 @@
 export const TAMANHOS_DISPONIVEIS = ["P", "M", "G", "GG"] as const;
 
+export const CATEGORIAS_DISPONIVEIS = [
+  "Torcedor",
+  "Retrô",
+  "Player",
+  "Manga Longa",
+  "Feminina",
+  "Regata",
+  "Infantil",
+  "Básica",
+] as const;
+
+export type Categoria = (typeof CATEGORIAS_DISPONIVEIS)[number];
+
+export const ESTADOS_BRASIL = [
+  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO",
+  "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI",
+  "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO",
+] as const;
+
+export type Perfil = {
+  user_id: string;
+  telefone: string;
+  rua: string;
+  numero: string;
+  complemento: string | null;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  cep: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type PedidoStatus = "aguardando_pagamento" | "pago" | "cancelado";
 
 export type Camisa = {
@@ -8,6 +41,7 @@ export type Camisa = {
   descricao: string | null;
   preco: number;
   foto_url: string | null;
+  categoria: string;
   ativo: boolean;
   created_at: string;
 };
@@ -23,6 +57,17 @@ export type CamisaComTamanhos = Camisa & {
   camisa_tamanhos: CamisaTamanho[];
 };
 
+export type CamisaFoto = {
+  id: string;
+  camisa_id: string;
+  url: string;
+  ordem: number;
+};
+
+export type CamisaComDetalhes = CamisaComTamanhos & {
+  camisa_fotos: CamisaFoto[];
+};
+
 export type Pedido = {
   id: string;
   user_id: string;
@@ -31,6 +76,14 @@ export type Pedido = {
   forma_pagamento: string | null;
   mercado_pago_preference_id: string | null;
   mercado_pago_payment_id: string | null;
+  entrega_telefone: string | null;
+  entrega_rua: string | null;
+  entrega_numero: string | null;
+  entrega_complemento: string | null;
+  entrega_bairro: string | null;
+  entrega_cidade: string | null;
+  entrega_estado: string | null;
+  entrega_cep: string | null;
   created_at: string;
 };
 

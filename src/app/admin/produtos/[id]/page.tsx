@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { CamisaComTamanhos } from "@/lib/types";
-import { salvarCamisa } from "../actions";
+import type { CamisaComDetalhes } from "@/lib/types";
+import { removerFotoExtra, salvarCamisa } from "../actions";
 import { ProdutoForm } from "../ProdutoForm";
 
 export const dynamic = "force-dynamic";
@@ -13,17 +13,17 @@ export default async function EditarProdutoPage({ params }: { params: Promise<{ 
   const { data: camisa } = await admin
     .from("camisas")
     .select(
-      "id, modelo, descricao, preco, foto_url, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque)",
+      "id, modelo, descricao, preco, foto_url, categoria, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque), camisa_fotos(id, camisa_id, url, ordem)",
     )
     .eq("id", id)
-    .maybeSingle<CamisaComTamanhos>();
+    .maybeSingle<CamisaComDetalhes>();
 
   if (!camisa) notFound();
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <h1 className="mb-6 text-2xl font-bold">Editar produto</h1>
-      <ProdutoForm action={salvarCamisa} camisa={camisa} />
+      <ProdutoForm action={salvarCamisa} removerFoto={removerFotoExtra} camisa={camisa} />
     </div>
   );
 }

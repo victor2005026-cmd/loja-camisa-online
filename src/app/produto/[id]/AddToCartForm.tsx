@@ -42,7 +42,7 @@ export function AddToCartForm({
   return (
     <div className="mt-6 space-y-4">
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Tamanho</label>
+        <label className="mb-1 block text-sm font-medium text-muted">Tamanho</label>
         <div className="flex flex-wrap gap-2">
           {tamanhos.map((t) => (
             <button
@@ -52,10 +52,10 @@ export function AddToCartForm({
                 setQuantidade(1);
                 setAdicionado(false);
               }}
-              className={`rounded-lg border px-3 py-1.5 text-sm font-medium ${
+              className={`rounded-lg border px-3 py-1.5 font-display text-sm tracking-wide transition ${
                 tamanho === t.tamanho
-                  ? "border-black bg-black text-white"
-                  : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                  ? "border-flare bg-flare text-ink"
+                  : "border-line text-paper hover:border-muted"
               }`}
             >
               {t.tamanho}
@@ -65,29 +65,29 @@ export function AddToCartForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">Quantidade</label>
+        <label className="mb-1 block text-sm font-medium text-muted">Quantidade</label>
         <input
           type="number"
           min={1}
           max={estoqueSelecionado}
           value={quantidade}
           onChange={(e) => setQuantidade(Math.max(1, Math.min(Number(e.target.value), estoqueSelecionado)))}
-          className="w-24 rounded-lg border border-gray-300 px-3 py-1.5 text-sm"
+          className="w-24 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm text-paper"
         />
-        <span className="ml-2 text-xs text-gray-500">{estoqueSelecionado} em estoque</span>
+        <span className="ml-2 text-xs text-muted">{estoqueSelecionado} em estoque</span>
       </div>
 
       <div className="flex gap-3">
         <button
           onClick={handleAdd}
-          className="rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
+          className="rounded-lg bg-flare px-5 py-2.5 text-sm font-semibold text-ink hover:brightness-110"
         >
           Adicionar ao carrinho
         </button>
         {adicionado && (
           <button
             onClick={() => router.push("/carrinho")}
-            className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            className="rounded-lg border border-line px-5 py-2.5 text-sm font-semibold text-paper hover:bg-surface"
           >
             Ir para o carrinho
           </button>

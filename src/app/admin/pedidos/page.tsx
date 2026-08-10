@@ -21,7 +21,7 @@ export default async function AdminPedidosPage() {
   const { data: pedidos } = await admin
     .from("pedidos")
     .select(
-      "id, user_id, status, valor_total, forma_pagamento, mercado_pago_payment_id, created_at, pedido_itens(id, pedido_id, camisa_id, tamanho, quantidade, preco_unitario, camisas(modelo, foto_url))",
+      "id, user_id, status, valor_total, forma_pagamento, mercado_pago_payment_id, entrega_telefone, entrega_rua, entrega_numero, entrega_complemento, entrega_bairro, entrega_cidade, entrega_estado, entrega_cep, created_at, pedido_itens(id, pedido_id, camisa_id, tamanho, quantidade, preco_unitario, camisas(modelo, foto_url))",
     )
     .order("created_at", { ascending: false })
     .returns<PedidoComItens[]>();
@@ -65,6 +65,21 @@ export default async function AdminPedidosPage() {
                 </p>
               ))}
             </div>
+
+            {pedido.entrega_rua && (
+              <div className="mt-3 rounded-lg bg-gray-50 p-3 text-sm text-gray-700">
+                <p className="font-medium text-gray-900">Entrega</p>
+                <p>
+                  {pedido.entrega_rua}, {pedido.entrega_numero}
+                  {pedido.entrega_complemento && ` - ${pedido.entrega_complemento}`}
+                </p>
+                <p>
+                  {pedido.entrega_bairro} · {pedido.entrega_cidade}/{pedido.entrega_estado} · CEP{" "}
+                  {pedido.entrega_cep}
+                </p>
+                <p>Tel: {pedido.entrega_telefone}</p>
+              </div>
+            )}
 
             <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
               <span className="text-sm font-medium text-gray-700">Total</span>

@@ -30,17 +30,17 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/90 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-        <Link href="/" className="text-lg font-bold text-gray-900">
+    <header className="sticky top-0 z-10 border-b border-line bg-ink/95 backdrop-blur">
+      <div className="flex w-full items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        <Link href="/" className="font-display text-lg uppercase tracking-wide text-paper">
           Loja de Camisas
         </Link>
 
-        <div className="flex items-center gap-3">
-          <Link href="/carrinho" className="relative flex items-center gap-1 text-sm font-medium text-gray-700">
+        <div className="flex items-center gap-4">
+          <Link href="/carrinho" className="relative flex items-center gap-1.5 text-sm font-medium text-muted hover:text-paper">
             <span>Carrinho</span>
             {itemCount > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-black px-1 text-xs text-white">
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-flare px-1 font-display text-xs text-ink">
                 {itemCount}
               </span>
             )}
@@ -48,7 +48,7 @@ export function Header() {
 
           {user ? (
             <div className="flex items-center gap-3">
-              <Link href="/pedidos" className="text-sm font-medium text-gray-700">
+              <Link href="/pedidos" className="text-sm font-medium text-muted hover:text-paper">
                 Meus pedidos
               </Link>
               {user.user_metadata?.avatar_url && (
@@ -56,15 +56,15 @@ export function Header() {
                 <img
                   src={user.user_metadata.avatar_url}
                   alt={user.user_metadata?.full_name ?? "Avatar"}
-                  className="h-7 w-7 rounded-full"
+                  className="h-7 w-7 rounded-full border border-line"
                 />
               )}
-              <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-gray-800">
+              <button onClick={handleLogout} className="text-sm text-muted hover:text-paper">
                 Sair
               </button>
             </div>
           ) : (
-            <GoogleLoginButton className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50" />
+            <GoogleLoginButton className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-paper hover:border-muted" />
           )}
         </div>
       </div>

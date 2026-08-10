@@ -11,7 +11,7 @@ export default async function AdminProdutosPage() {
   const { data: camisas } = await admin
     .from("camisas")
     .select(
-      "id, modelo, descricao, preco, foto_url, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque)",
+      "id, modelo, descricao, preco, foto_url, categoria, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque)",
     )
     .order("created_at", { ascending: false })
     .returns<CamisaComTamanhos[]>();
@@ -42,7 +42,12 @@ export default async function AdminProdutosPage() {
             </div>
 
             <div className="min-w-40 flex-1">
-              <p className="text-sm font-semibold text-gray-900">{camisa.modelo}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold text-gray-900">{camisa.modelo}</p>
+                <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                  {camisa.categoria}
+                </span>
+              </div>
               <p className="text-xs text-gray-500">
                 {camisa.camisa_tamanhos.map((t) => `${t.tamanho}: ${t.estoque}`).join(" · ")}
               </p>

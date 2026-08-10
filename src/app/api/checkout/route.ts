@@ -19,6 +19,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "É necessário estar logado." }, { status: 401 });
   }
 
+  const { data: perfil } = await supabase
+    .from("perfis")
+    .select("telefone, rua, numero, complemento, bairro, cidade, estado, cep")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!perfil) {
+    return NextResponse.json(
+      { error: "Complete seu cadastro (telefone e endereço) antes de finalizar a compra.", redirectTo: "/completar-cadastro" },
+      { status: 400 },
+    );
+  }
+
   const body = await request.json().catch(() => null);
   const itens: ItemRequest[] = body?.itens;
 
@@ -96,6 +109,14 @@ export async function POST(request: Request) {
       user_id: user.id,
       status: "aguardando_pagamento",
       valor_total: valorTotal,
+      entrega_telefone: perfil.telefone,
+      entrega_rua: perfil.rua,
+      entrega_numero: perfil.numero,
+      entrega_complemento: perfil.complemento,
+      entrega_bairro: perfil.bairro,
+      entrega_cidade: perfil.cidade,
+      entrega_estado: perfil.estado,
+      entrega_cep: perfil.cep,
     })
     .select("id")
     .single();
@@ -132,6 +153,15 @@ export async function POST(request: Request) {
         auto_return: "approved",
         payer: {
           email: user.email ?? undefined,
+        },
+        payment_methods: {
+          excluded_payment_types: [
+            { id: "credit_card" },
+            { id: "debit_card" },
+            { id: "prepaid_card" },
+            { id: "ticket" },
+            { id: "atm" },
+          ],
         },
         statement_descriptor: "LOJA CAMISAS",
       },

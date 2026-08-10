@@ -1,5 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { expirarPedidosVencidos } from "@/lib/expirar-pedidos";
 import type { PedidoComItens } from "@/lib/types";
+import { cancelarPedido, marcarComoPago } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +18,7 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 export default async function AdminPedidosPage() {
+  await expirarPedidosVencidos();
   const admin = createAdminClient();
 
   const { data: pedidos } = await admin
@@ -87,6 +90,21 @@ export default async function AdminPedidosPage() {
                 {pedido.valor_total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
               </span>
             </div>
+
+            {pedido.status === "aguardando_pagamento" && (
+              <div className="mt-3 flex gap-2 border-t border-gray-100 pt-3">
+                <form action={marcarComoPago.bind(null, pedido.id)}>
+                  <button className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-700">
+                    Marcar como pago
+                  </button>
+                </form>
+                <form action={cancelarPedido.bind(null, pedido.id)}>
+                  <button className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100">
+                    Cancelar
+                  </button>
+                </form>
+              </div>
+            )}
           </div>
         ))}
 

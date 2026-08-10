@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { expirarPedidosVencidos } from "@/lib/expirar-pedidos";
 import type { PedidoComItens } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -30,6 +31,8 @@ export default async function PedidosPage() {
       </div>
     );
   }
+
+  await expirarPedidosVencidos();
 
   const { data: pedidos } = await supabase
     .from("pedidos")
@@ -100,6 +103,15 @@ export default async function PedidosPage() {
                   {pedido.valor_total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                 </span>
               </div>
+
+              {pedido.status === "aguardando_pagamento" && (
+                <Link
+                  href={`/pedidos/${pedido.id}/pagamento`}
+                  className="mt-3 block text-center text-sm font-medium text-flare underline"
+                >
+                  Ver QR Code / código Pix
+                </Link>
+              )}
             </div>
           ))}
         </div>

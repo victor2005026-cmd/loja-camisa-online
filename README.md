@@ -1,8 +1,9 @@
 # Loja de Camisas Online
 
-Loja pública de venda de camisas — catálogo, login com Google, carrinho e
-pagamento real (Pix, débito e crédito) via Mercado Pago. Stack: Next.js 16
-(App Router) + TypeScript + Tailwind CSS + Supabase (banco + auth).
+Loja pública de venda de camisas — catálogo, login com Google ou e-mail/senha,
+carrinho e pagamento real via Pix (chave própria, com QR Code e copia-e-cola).
+Stack: Next.js 16 (App Router) + TypeScript + Tailwind CSS + Supabase (banco,
+auth e storage).
 
 Este é um projeto **isolado**: usa seu próprio projeto Supabase, criado do
 zero, sem qualquer relação com outros sistemas ou tabelas que você já tenha.
@@ -150,41 +151,35 @@ esteja na lista, junto com a de `/auth/callback`.
 
 ---
 
-## 4. Configurar o Mercado Pago (modo de teste)
+## 4. Configurar o Pix (chave própria, sem intermediador)
 
-1. Acesse [mercadopago.com.br/developers/panel](https://www.mercadopago.com.br/developers/panel) e faça login com sua conta Mercado Pago (ou crie uma).
-2. **Suas integrações → Criar aplicação**. Escolha "Pagamentos online" / "CheckoutPro".
-3. Na aplicação criada, aba **Credenciais de teste**, copie:
-   - `Public Key` → `NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY`
-   - `Access Token` → `MERCADOPAGO_ACCESS_TOKEN` (**secreto**, só no backend)
-4. Em **Contas de teste** (menu lateral, fora da aplicação), crie 2 usuários de teste:
-   - Um **vendedor** de teste (não é usado diretamente aqui, mas fica registrado).
-   - Um **comprador** de teste — é com esse login que você vai simular a compra
-     no checkout do Mercado Pago (ele não usa dinheiro real).
-5. Para simular Pix/cartão aprovado ou recusado em teste, use os
-   [cartões de teste do Mercado Pago](https://www.mercadopago.com.br/developers/pt/docs/checkout-pro/additional-content/your-integrations/test/cards)
-   — por exemplo, um cartão de teste de crédito com CVV `123` e nome do titular
-   `APRO` para aprovação automática.
+O pagamento hoje é só Pix, gerado direto da sua própria chave (sem Mercado
+Pago) — o cliente vê um QR Code e um código "copia e cola" na própria loja,
+paga direto na sua conta, e **você confirma manualmente** no painel admin.
+Diferente do Mercado Pago, não existe nenhum aviso automático de que alguém
+pagou — nem o Pix nem nenhum serviço te notifica sozinho, então a confirmação
+depende de você conferir o extrato/app do banco.
 
-### 4.1 O webhook precisa de uma URL pública mesmo em desenvolvimento
+1. Preencha no `.env.local`:
+   - `PIX_KEY` — sua chave Pix (CPF, CNPJ, e-mail, telefone ou chave aleatória)
+   - `PIX_MERCHANT_NAME` — nome exibido no QR Code (até 25 caracteres, sem acento)
+   - `PIX_MERCHANT_CITY` — cidade exibida no QR Code (até 15 caracteres, sem acento)
+2. Pronto — não precisa de conta em nenhum serviço externo pra isso funcionar.
 
-O Mercado Pago envia a confirmação de pagamento via HTTP POST para
-`NEXT_PUBLIC_SITE_URL/api/mercadopago/webhook`. Isso significa que
-`localhost:3000` **não** recebe a notificação diretamente. Para testar local:
-
-1. Instale um túnel, ex. [ngrok](https://ngrok.com/) ou `cloudflared`:
-   ```bash
-   ngrok http 3000
-   ```
-2. Copie a URL pública gerada (ex. `https://abcd1234.ngrok-free.app`) e coloque
-   em `NEXT_PUBLIC_SITE_URL` no seu `.env.local`.
-3. Reinicie `npm run dev`.
-4. Agora, quando você finalizar uma compra de teste, o Mercado Pago vai
-   conseguir notificar seu servidor local via o túnel.
-
-Sem isso, o pedido fica criado (`aguardando_pagamento`), o pagamento é
-aprovado no lado do Mercado Pago, mas o webhook nunca chega e o pedido nunca
-muda para `pago`.
+**Como o pedido fica sem pagar (estoque, tempo, cancelamento):**
+- Ao clicar em "Finalizar compra", o estoque do tamanho já é **reservado na
+  hora** (abatido do `camisa_tamanhos`), e o pedido nasce como
+  `aguardando_pagamento`.
+- O cliente tem **30 minutos** (contados a partir da criação do pedido) pra
+  pagar — é o timer mostrado na tela de pagamento.
+- Se o tempo passar sem confirmação manual sua, o pedido é cancelado
+  automaticamente (na próxima vez que alguém abrir o catálogo, a tela de
+  pedidos, ou o admin — não tem cron/infra externa, é verificado nessas
+  telas) e o estoque reservado volta a ficar disponível.
+- Pra confirmar que um pagamento caiu, você mesmo confere seu extrato/app do
+  banco e clica em **"Marcar como pago"** na tela `/admin/pedidos` (ou
+  **"Cancelar"**, se o cliente desistiu, pra liberar o estoque na hora sem
+  esperar os 30 min).
 
 ---
 
@@ -201,47 +196,30 @@ Abra [http://localhost:3000](http://localhost:3000).
 
 ### 5.1 Testando uma compra de ponta a ponta
 
-1. Clique em **Entrar com Google** e faça login (use uma conta real do
-   Google — o login é normal, só o pagamento é que é em modo teste).
+1. Entre na loja (Google ou e-mail/senha).
 2. Escolha uma camisa, um tamanho, e clique em **Adicionar ao carrinho**.
 3. Vá em **Carrinho → Finalizar compra**. Isso chama `POST /api/checkout`, que:
    - valida estoque e recalcula o preço direto do banco;
-   - cria uma linha em `pedidos` com `status = aguardando_pagamento`;
-   - cria a preferência no Mercado Pago e te redireciona para o checkout.
-4. No checkout do Mercado Pago, **faça login com a conta de comprador de
-   teste** (não com sua conta pessoal) e finalize o pagamento com um dos
-   [cartões de teste](https://www.mercadopago.com.br/developers/pt/docs/checkout-pro/additional-content/your-integrations/test/cards),
-   ou escolha Pix (o Mercado Pago simula a aprovação automaticamente em modo teste).
-5. Você volta para `/pedidos?status=sucesso`. Se o túnel (ngrok) estiver de
-   pé, em alguns segundos o pedido muda de **Aguardando pagamento** para
-   **Pago** — o webhook processou a confirmação e abateu o estoque em
-   `camisa_tamanhos`.
-6. Recarregue o catálogo (`/`) e confira que o estoque daquele tamanho caiu.
+   - cria o pedido com `status = aguardando_pagamento` e **reserva o estoque**
+     (abate na hora, sem esperar pagamento);
+   - gera o BR Code/QR do Pix e te leva pra `/pedidos/[id]/pagamento`.
+4. Você vê o QR Code, o botão "Copiar código Pix" e o timer de 30 minutos.
+   Como é uma chave Pix de verdade, dá pra escanear com o app do seu banco e
+   pagar de verdade (valor baixo, é sua própria chave recebendo).
+5. Depois de pagar (ou só pra testar sem pagar de verdade), vá em
+   `/admin/pedidos` e clique em **"Marcar como pago"** nesse pedido.
+6. A tela de pagamento do cliente detecta a mudança sozinha em alguns
+   segundos (fica checando o status) e redireciona pra `/pedidos?status=sucesso`.
+7. Recarregue o catálogo (`/`) e confira que o estoque daquele tamanho caiu
+   (na verdade já tinha caído no passo 3 — a confirmação só muda o status).
 
-Se quiser inspecionar as notificações recebidas, veja os logs do terminal
-onde `npm run dev` está rodando — o webhook loga erros de validação (valor
-pago não confere, pedido não encontrado, etc).
-
----
-
-## 6. Indo para produção (quando tiver CPF/CNPJ vinculado ao Mercado Pago)
-
-1. Na sua aplicação em **developers.mercadopago.com/panel**, complete a
-   ativação de produção (vincula CPF/CNPJ e dados bancários).
-2. Copie as **Credenciais de produção** (Public Key e Access Token — começam
-   sem o prefixo `TEST-`).
-3. No `.env` de produção (Vercel), troque:
-   - `MERCADOPAGO_ACCESS_TOKEN` → access token de produção
-   - `NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY` → public key de produção
-   - `MERCADOPAGO_ENV=production`
-4. Não precisa mudar nenhum código — a rota `/api/checkout` já escolhe entre
-   `sandbox_init_point` e `init_point` com base em `MERCADOPAGO_ENV`.
-5. Faça uma compra real de baixo valor para confirmar que webhook, estoque e
-   pedido pago estão funcionando antes de divulgar a loja.
+Pra testar o cancelamento/expiração: crie um pedido e não confirme nada —
+depois de 30 minutos, ele vira `cancelado` sozinho (verificado quando alguém
+abre o catálogo, `/pedidos` ou `/admin/pedidos`) e o estoque volta.
 
 ---
 
-## 7. Deploy na Vercel
+## 6. Deploy na Vercel
 
 1. Suba este projeto para um repositório Git (GitHub/GitLab/Bitbucket).
 2. Em [vercel.com/new](https://vercel.com/new), importe o repositório.
@@ -252,10 +230,14 @@ pago não confere, pedido não encontrado, etc).
    | `NEXT_PUBLIC_SUPABASE_URL` | URL do seu projeto Supabase |
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon key do Supabase |
    | `SUPABASE_SERVICE_ROLE_KEY` | service role key do Supabase |
-   | `MERCADOPAGO_ACCESS_TOKEN` | access token (teste ou produção) |
-   | `NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY` | public key (teste ou produção) |
-   | `MERCADOPAGO_ENV` | `test` ou `production` |
+   | `ADMIN_EMAILS` | seu(s) e-mail(s) de admin |
+   | `PIX_KEY` | sua chave Pix |
+   | `PIX_MERCHANT_NAME` | nome exibido no QR Code |
+   | `PIX_MERCHANT_CITY` | cidade exibida no QR Code |
    | `NEXT_PUBLIC_SITE_URL` | URL final do site na Vercel, ex. `https://sua-loja.vercel.app` |
+
+   `MERCADOPAGO_*` não é necessário hoje (não está em uso) — só adicione
+   quando reativar cartão, veja a seção 8.
 
 4. Deploy. Depois do primeiro deploy, copie a URL gerada pela Vercel e:
    - Atualize `NEXT_PUBLIC_SITE_URL` com essa URL (e faça redeploy).
@@ -266,13 +248,9 @@ pago não confere, pedido não encontrado, etc).
      pedir uma nova (normalmente não precisa, o redirect fica todo no domínio
      do Supabase).
 
-O webhook do Mercado Pago passa a apontar automaticamente para
-`https://sua-loja.vercel.app/api/mercadopago/webhook` — não precisa mais de
-ngrok em produção.
-
 ---
 
-## 8. Painel de administração (`/admin`)
+## 7. Painel de administração (`/admin`)
 
 Tela restrita pra você (dono da loja) cadastrar/editar produtos e ver os
 pedidos recebidos. Não aparece nenhum link pra ela na navegação pública —
@@ -286,32 +264,62 @@ acesse direto pela URL.
    em produção). Quem não estiver na lista de `ADMIN_EMAILS` é redirecionado
    pro catálogo.
 4. **`/admin/produtos`** — lista todos os produtos (inclusive inativos), com
-   botão **Novo produto** e **Editar** (modelo, descrição, preço, foto,
-   estoque por tamanho P/M/G/GG e se está ativo/visível no catálogo) e um
-   atalho pra ativar/desativar sem abrir o formulário.
+   botão **Novo produto** e **Editar** (modelo, descrição, preço, categoria,
+   fotos, estoque por tamanho P/M/G/GG e se está ativo/visível no catálogo) e
+   um atalho pra ativar/desativar sem abrir o formulário.
 5. **`/admin/pedidos`** — lista todos os pedidos de todos os clientes, com
-   e-mail do comprador, itens, forma de pagamento, status e valor total.
+   e-mail do comprador, itens, endereço de entrega, status e valor total.
+   Pedidos `aguardando_pagamento` têm botões **"Marcar como pago"** (depois
+   de você conferir que o Pix caiu) e **"Cancelar"** (libera o estoque na
+   hora).
 
 Todas as escritas do painel usam a `service_role` key (mesmo client admin já
-usado no checkout/webhook) e checam `ADMIN_EMAILS` de novo no servidor a cada
-ação — a proteção não depende só da tela não ter link visível.
+usado no checkout) e checam `ADMIN_EMAILS` de novo no servidor a cada ação —
+a proteção não depende só da tela não ter link visível.
+
+---
+
+## 8. Mercado Pago (reservado — ativar quando quiser aceitar cartão)
+
+Não está em uso agora (o pagamento é só Pix direto, seção 4). O código de
+integração com o Mercado Pago (`mercadopago` no `package.json`, a rota
+`src/app/api/mercadopago/webhook/route.ts`) continua no projeto, só
+desconectado do checkout — reativar é trabalho de código (reintroduzir a
+criação de preferência em `/api/checkout`), não só configuração. Quando
+chegar a hora:
+
+1. Acesse [mercadopago.com.br/developers/panel](https://www.mercadopago.com.br/developers/panel) e faça login com sua conta Mercado Pago (ou crie uma).
+2. **Suas integrações → Criar aplicação**. Escolha "Pagamentos online" / "CheckoutPro".
+3. Na aplicação criada, aba **Credenciais de teste**, copie:
+   - `Public Key` → `NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY`
+   - `Access Token` → `MERCADOPAGO_ACCESS_TOKEN` (**secreto**, só no backend)
+4. Em **Contas de teste** (menu lateral, fora da aplicação), crie um
+   **comprador** de teste — é com esse login que se simula a compra no
+   checkout do Mercado Pago (não usa dinheiro real).
+5. O webhook precisa de URL pública mesmo em desenvolvimento: use um túnel
+   (ex. [ngrok](https://ngrok.com/) `ngrok http 3000`) e aponte
+   `NEXT_PUBLIC_SITE_URL` pra URL gerada, sem isso o pedido fica em
+   `aguardando_pagamento` mesmo com o pagamento aprovado do lado do Mercado Pago.
+6. Pra produção: complete a ativação de produção no painel deles (vincula
+   CPF/CNPJ e dados bancários), troque as credenciais de teste pelas de
+   produção e `MERCADOPAGO_ENV=production` — a rota já escolhe entre
+   `sandbox_init_point` e `init_point` sozinha com base nessa variável.
 
 ---
 
 ## Segurança — o que já está garantido no código
 
-- O `SUPABASE_SERVICE_ROLE_KEY` e o `MERCADOPAGO_ACCESS_TOKEN` só são lidos em
-  `src/app/api/**` (roda no servidor) e em `src/lib/supabase/admin.ts`. Nunca
-  aparecem em nenhum componente cliente nem no bundle enviado ao navegador.
+- O `SUPABASE_SERVICE_ROLE_KEY` e o `PIX_KEY` só são lidos em `src/app/api/**`
+  e `src/lib/**` (roda no servidor). Nunca aparecem em nenhum componente
+  cliente nem no bundle enviado ao navegador (o BR Code final, que já contém
+  a chave Pix embutida — é assim que o Pix funciona, o pagador precisa ver a
+  chave —, esse sim é enviado ao cliente, só a variável de ambiente crua não).
 - `POST /api/checkout` ignora qualquer preço/estoque enviado pelo navegador:
   busca `camisas`/`camisa_tamanhos` de novo no banco e recalcula o total.
-- `POST /api/mercadopago/webhook` confere se `transaction_amount` do
-  pagamento aprovado é igual ao `valor_total` do pedido antes de marcar como
-  `pago` e abater estoque — se não bater, o pedido é cancelado em vez de
-  aprovado.
-- O webhook é idempotente: se o Mercado Pago reenviar a mesma notificação
-  (comportamento normal do serviço), um pedido já `pago` não sofre o
-  abatimento de estoque de novo.
+- Como o pagamento é confirmado manualmente (sem webhook/PSP), a confirmação
+  (`marcarComoPago`) e o cancelamento (`cancelarPedido`) só existem como
+  server actions do painel `/admin`, atrás do `requireAdmin()` — o cliente
+  nunca consegue mudar o próprio status de pedido.
 - RLS no Supabase garante que um cliente só lê/cria os próprios `pedidos` e
   `pedido_itens`; não existe policy de `UPDATE`/`DELETE` para o cliente —
   status de pedido e estoque só mudam via rotas de servidor.
@@ -337,17 +345,20 @@ src/
     redefinir-senha/page.tsx     # definir nova senha (via link do e-mail)
     termos/page.tsx              # Termos de Uso
     privacidade/page.tsx         # Política de Privacidade (LGPD)
+    pedidos/[id]/pagamento/page.tsx  # QR Code Pix, copia-e-cola, timer de 30min
     auth/callback/route.ts       # callback do OAuth do Google
     auth/confirm/route.ts        # confirma e-mail (cadastro) e recuperação de senha
-    api/checkout/route.ts        # cria pedido + preferência Mercado Pago
-    api/mercadopago/webhook/route.ts  # confirma pagamento, abate estoque
+    api/checkout/route.ts        # cria pedido, reserva estoque, gera o Pix
+    api/pedidos/[id]/status/route.ts  # status do pedido (polling da tela de pagamento)
+    api/mercadopago/webhook/route.ts  # não usado hoje — reservado (seção 8)
     admin/                        # painel restrito (ADMIN_EMAILS)
       layout.tsx                  # protege todas as rotas /admin
       produtos/page.tsx           # lista + ativar/desativar produto
       produtos/novo/page.tsx      # criar produto
       produtos/[id]/page.tsx      # editar produto + estoque por tamanho + fotos
       produtos/actions.ts         # server actions (service_role)
-      pedidos/page.tsx            # lista de todos os pedidos + dados de entrega
+      pedidos/page.tsx            # lista de pedidos + dados de entrega
+      pedidos/actions.ts          # marcar como pago / cancelar (service_role)
   components/
     Header.tsx, Footer.tsx, GoogleLoginButton.tsx, ShirtPlaceholder.tsx
   lib/
@@ -355,6 +366,8 @@ src/
     supabase/server.ts           # client Supabase p/ Server Components (RLS)
     supabase/admin.ts            # client com service_role (só em rotas de API)
     supabase/storage.ts          # upload/remoção de fotos no bucket camisas-fotos
+    pix.ts                       # gera o BR Code + QR Code (pix-utils)
+    expirar-pedidos.ts           # cancela pedidos vencidos e devolve estoque
     cart-store.ts                # carrinho (zustand + localStorage)
     admin-auth.ts                # checa ADMIN_EMAILS no servidor
     types.ts

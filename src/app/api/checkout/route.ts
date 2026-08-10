@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { MercadoPagoConfig, Preference } from "mercadopago";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { expirarPedidosVencidos } from "@/lib/expirar-pedidos";
 import type { CamisaComTamanhos } from "@/lib/types";
 
 type ItemRequest = {
@@ -39,6 +39,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Carrinho vazio." }, { status: 400 });
   }
 
+  // Libera o estoque de pedidos vencidos antes de checar disponibilidade.
+  await expirarPedidosVencidos();
+
   const admin = createAdminClient();
 
   // Nunca confiamos em preço/estoque vindos do cliente: buscamos tudo de novo no banco.
@@ -56,7 +59,6 @@ export async function POST(request: Request) {
 
   const camisasById = new Map(camisas.map((c) => [c.id, c]));
 
-  const preferenceItems: { id: string; title: string; quantity: number; unit_price: number; currency_id: string }[] = [];
   const pedidoItensParaInserir: {
     camisa_id: string;
     tamanho: string;
@@ -87,14 +89,6 @@ export async function POST(request: Request) {
     const precoUnitario = camisa.preco;
     valorTotal += precoUnitario * item.quantidade;
 
-    preferenceItems.push({
-      id: camisa.id,
-      title: `${camisa.modelo} (${item.tamanho})`,
-      quantity: item.quantidade,
-      unit_price: precoUnitario,
-      currency_id: "BRL",
-    });
-
     pedidoItensParaInserir.push({
       camisa_id: camisa.id,
       tamanho: item.tamanho,
@@ -109,6 +103,7 @@ export async function POST(request: Request) {
       user_id: user.id,
       status: "aguardando_pagamento",
       valor_total: valorTotal,
+      forma_pagamento: "pix",
       entrega_telefone: perfil.telefone,
       entrega_rua: perfil.rua,
       entrega_numero: perfil.numero,
@@ -134,51 +129,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Não foi possível registrar os itens do pedido." }, { status: 500 });
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? new URL(request.url).origin;
-
-  try {
-    const mpClient = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN! });
-    const preference = new Preference(mpClient);
-
-    const result = await preference.create({
-      body: {
-        items: preferenceItems,
-        external_reference: pedido.id,
-        notification_url: `${baseUrl}/api/mercadopago/webhook`,
-        back_urls: {
-          success: `${baseUrl}/pedidos?status=sucesso`,
-          pending: `${baseUrl}/pedidos?status=pendente`,
-          failure: `${baseUrl}/carrinho?status=falha`,
-        },
-        auto_return: "approved",
-        payer: {
-          email: user.email ?? undefined,
-        },
-        payment_methods: {
-          excluded_payment_types: [
-            { id: "credit_card" },
-            { id: "debit_card" },
-            { id: "prepaid_card" },
-            { id: "ticket" },
-            { id: "atm" },
-          ],
-        },
-        statement_descriptor: "LOJA CAMISAS",
-      },
-    });
+  // Reserva o estoque (é devolvido automaticamente se o pedido expirar sem pagamento).
+  for (const item of pedidoItensParaInserir) {
+    const tamanhoInfo = camisasById
+      .get(item.camisa_id)!
+      .camisa_tamanhos.find((t) => t.tamanho === item.tamanho)!;
 
     await admin
-      .from("pedidos")
-      .update({ mercado_pago_preference_id: result.id })
-      .eq("id", pedido.id);
-
-    const initPoint =
-      process.env.MERCADOPAGO_ENV === "production" ? result.init_point : result.sandbox_init_point;
-
-    return NextResponse.json({ initPoint: initPoint ?? result.init_point, pedidoId: pedido.id });
-  } catch (err) {
-    await admin.from("pedidos").update({ status: "cancelado" }).eq("id", pedido.id);
-    console.error("Erro ao criar preferência no Mercado Pago", err);
-    return NextResponse.json({ error: "Não foi possível iniciar o pagamento." }, { status: 500 });
+      .from("camisa_tamanhos")
+      .update({ estoque: tamanhoInfo.estoque - item.quantidade })
+      .eq("camisa_id", item.camisa_id)
+      .eq("tamanho", item.tamanho);
   }
+
+  return NextResponse.json({ pedidoId: pedido.id });
 }

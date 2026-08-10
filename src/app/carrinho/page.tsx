@@ -11,7 +11,7 @@ import { ShirtPlaceholder } from "@/components/ShirtPlaceholder";
 
 export default function CarrinhoPage() {
   const router = useRouter();
-  const { items, updateQuantidade, removeItem, total } = useCartStore();
+  const { items, updateQuantidade, removeItem, total, clear } = useCartStore();
   const [user, setUser] = useState<User | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -53,7 +53,8 @@ export default function CarrinhoPage() {
         return;
       }
 
-      window.location.href = data.initPoint;
+      clear();
+      router.push(`/pedidos/${data.pedidoId}/pagamento`);
     } catch {
       setErro("Erro de conexão. Tente novamente.");
       setLoading(false);

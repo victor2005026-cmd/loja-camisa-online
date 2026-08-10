@@ -97,18 +97,40 @@ Além do Google, a loja também aceita cadastro/login com e-mail e senha
 (`/cadastro`, `/entrar`, `/recuperar-senha`, `/redefinir-senha`), com
 confirmação por e-mail obrigatória antes do primeiro login.
 
-### 3.1 Conferir que a confirmação de e-mail está ativa
+### 3.1 Configurar SMTP próprio (obrigatório)
+
+O envio de e-mail embutido do Supabase é muito limitado (poucos e-mails por
+hora) e **só libera editar o conteúdo/HTML dos templates se você configurar
+um SMTP próprio** — sem isso, o passo 3.2 nem aparece disponível para edição.
+Usamos o [Resend](https://resend.com) (gratuito até 3.000 e-mails/mês):
+
+1. Crie uma conta em [resend.com](https://resend.com)
+2. No painel do Resend, vá em **API Keys → Create API Key** e copie a chave gerada
+3. No Supabase: **Project Settings → Authentication → SMTP Settings** (ative
+   "Enable Custom SMTP") e preencha:
+   - **Sender email**: `onboarding@resend.dev` (funciona sem verificar domínio
+     próprio; quando você tiver um domínio da loja, pode trocar por algo como
+     `naoresponda@sualoja.com.br` verificando o domínio no Resend)
+   - **Sender name**: `Loja de Camisas`
+   - **Host**: `smtp.resend.com`
+   - **Port**: `465`
+   - **Username**: `resend`
+   - **Password**: a API Key copiada no passo 2
+4. Salve
+
+### 3.2 Conferir que a confirmação de e-mail está ativa
 
 **Authentication → Sign In / Providers → Email** → confirme que **Confirm
 email** está ativado (é o padrão em projetos novos). Sem isso, qualquer
 e-mail entraria sem confirmar nada.
 
-### 3.2 Apontar os e-mails de confirmação pra rota da loja
+### 3.3 Apontar os e-mails de confirmação pra rota da loja
 
 Por padrão, o link desses e-mails leva pro servidor do Supabase, não pro seu
 site. Para os links funcionarem com a rota `/auth/confirm` já implementada no
 projeto (que confirma o cadastro **e** já verifica se falta completar o
-perfil), edite dois templates em **Authentication → Email Templates**:
+perfil), edite dois templates em **Authentication → Email Templates** (agora
+liberado, com o SMTP configurado no passo 3.1):
 
 **Confirm signup** — troque o link por:
 ```html
@@ -120,7 +142,7 @@ perfil), edite dois templates em **Authentication → Email Templates**:
 <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery">Redefinir senha</a>
 ```
 
-### 3.3 Redirect URLs
+### 3.4 Redirect URLs
 
 Em **Authentication → URL Configuration → Redirect URLs**, garanta que
 `http://localhost:3000/auth/confirm` (e depois a URL de produção) também
@@ -239,7 +261,7 @@ pago não confere, pedido não encontrado, etc).
    - Atualize `NEXT_PUBLIC_SITE_URL` com essa URL (e faça redeploy).
    - Adicione `https://sua-loja.vercel.app/auth/callback` e
      `https://sua-loja.vercel.app/auth/confirm` nas **Redirect URLs** do
-     Supabase (passos 2.3 e 3.3).
+     Supabase (passos 2.3 e 3.4).
    - Adicione a mesma URL como **Authorized redirect URI** só se o Supabase
      pedir uma nova (normalmente não precisa, o redirect fica todo no domínio
      do Supabase).

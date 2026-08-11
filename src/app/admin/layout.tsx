@@ -10,6 +10,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="mx-auto flex max-w-5xl gap-4 px-4 py-3 text-sm font-medium text-gray-700">
           <Link href="/admin/produtos">Produtos</Link>
           <Link href="/admin/pedidos">Pedidos</Link>
+          <Link href="/admin/hero">Banner da home</Link>
         </div>
       </nav>
       {children}

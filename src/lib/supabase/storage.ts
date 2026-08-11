@@ -2,13 +2,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 const BUCKET = "camisas-fotos";
 
-export async function uploadFotoCamisa(
-  admin: SupabaseClient,
-  camisaId: string,
-  file: File,
-): Promise<string> {
+async function uploadFoto(admin: SupabaseClient, pasta: string, file: File): Promise<string> {
   const extensao = file.name.split(".").pop() ?? "jpg";
-  const caminho = `${camisaId}/${crypto.randomUUID()}.${extensao}`;
+  const caminho = `${pasta}/${crypto.randomUUID()}.${extensao}`;
 
   const { error } = await admin.storage
     .from(BUCKET)
@@ -21,6 +17,14 @@ export async function uploadFotoCamisa(
 
   const { data } = admin.storage.from(BUCKET).getPublicUrl(caminho);
   return data.publicUrl;
+}
+
+export function uploadFotoCamisa(admin: SupabaseClient, camisaId: string, file: File) {
+  return uploadFoto(admin, camisaId, file);
+}
+
+export function uploadFotoHero(admin: SupabaseClient, file: File) {
+  return uploadFoto(admin, "hero", file);
 }
 
 export async function removerFotoStorage(admin: SupabaseClient, url: string) {

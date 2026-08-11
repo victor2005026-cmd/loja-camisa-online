@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { CATEGORIAS_DISPONIVEIS, type CamisaComDetalhes } from "@/lib/types";
+import { CATEGORIAS_DISPONIVEIS, type CamisaComDetalhes, type HeroFoto } from "@/lib/types";
 import { ShirtPlaceholder } from "@/components/ShirtPlaceholder";
+import { HeroColagem } from "@/components/HeroColagem";
 
 export const dynamic = "force-dynamic";
 
@@ -31,16 +32,27 @@ export default async function HomePage({
     c.camisa_tamanhos.some((t) => t.estoque > 0),
   );
 
-  const heroFoto = disponiveis.find((c) => c.foto_url)?.foto_url;
+  const { data: heroFotos } = await supabase
+    .from("hero_fotos")
+    .select("id, url, ordem")
+    .order("ordem", { ascending: true })
+    .returns<HeroFoto[]>();
+
+  const heroFotoUnica = disponiveis.find((c) => c.foto_url)?.foto_url;
 
   return (
     <div className="w-full">
       <div className="relative flex min-h-[380px] flex-col justify-end overflow-hidden border-b border-line sm:min-h-[460px]">
-        {heroFoto ? (
+        {heroFotos && heroFotos.length > 0 ? (
+          <>
+            <HeroColagem fotos={heroFotos.map((f) => f.url)} />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/10" />
+          </>
+        ) : heroFotoUnica ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={heroFoto}
+              src={heroFotoUnica}
               alt=""
               aria-hidden="true"
               className="absolute inset-0 h-full w-full object-cover"

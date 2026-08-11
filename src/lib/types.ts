@@ -18,6 +18,10 @@ export const ESTADOS_BRASIL = [
   "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO",
 ] as const;
 
+// Região atendida pela loja (Baixada Santista) — cadastro de endereço fica
+// restrito a essas cidades.
+export const CIDADES_ATENDIDAS = ["Santos", "São Vicente", "Praia Grande"] as const;
+
 export type Perfil = {
   user_id: string;
   telefone: string;

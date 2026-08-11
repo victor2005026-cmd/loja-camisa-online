@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useCartStore } from "@/lib/cart-store";
 
 const NUMERO = "5513991749391";
-const MENSAGEM = "Olá! Vim da Loja de Camisas e queria tirar uma dúvida.";
+const MENSAGEM = "Olá! Vim da LV Sports e queria tirar uma dúvida.";
 
 export function WhatsAppButton() {
   const pathname = usePathname();

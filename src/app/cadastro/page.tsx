@@ -38,7 +38,7 @@ export default function CadastroPage() {
       email,
       password: senha,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent("/completar-cadastro")}`,
+        emailRedirectTo: `${window.location.origin}/auth/confirm`,
       },
     });
 

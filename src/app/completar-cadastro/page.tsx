@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { ESTADOS_BRASIL } from "@/lib/types";
+import { CIDADES_ATENDIDAS } from "@/lib/types";
 import { salvarPerfil } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +32,8 @@ export default async function CompletarCadastroPage({
     <div className="mx-auto max-w-lg px-4 py-10">
       <h1 className="font-display text-2xl uppercase tracking-wide text-paper">Complete seu cadastro</h1>
       <p className="mt-1 text-sm text-muted">
-        Precisamos do seu telefone e endereço pra combinar a entrega das suas compras.
+        Precisamos do seu telefone e endereço pra combinar a entrega das suas compras. Por
+        enquanto só entregamos em Santos, São Vicente e Praia Grande.
       </p>
 
       <form action={salvarPerfil} className="mt-6 space-y-4">
@@ -96,33 +97,24 @@ export default async function CompletarCadastroPage({
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-muted">Cidade</label>
-            <input
-              name="cidade"
-              required
-              className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-paper"
-            />
-          </div>
-          <div className="col-span-1">
-            <label className="block text-sm font-medium text-muted">UF</label>
-            <select
-              name="estado"
-              required
-              defaultValue=""
-              className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-paper"
-            >
-              <option value="" disabled>
-                --
+        <div>
+          <label className="block text-sm font-medium text-muted">Cidade</label>
+          <select
+            name="cidade"
+            required
+            defaultValue=""
+            className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-paper"
+          >
+            <option value="" disabled>
+              Selecione
+            </option>
+            {CIDADES_ATENDIDAS.map((cidade) => (
+              <option key={cidade} value={cidade}>
+                {cidade}
               </option>
-              {ESTADOS_BRASIL.map((uf) => (
-                <option key={uf} value={uf}>
-                  {uf}
-                </option>
-              ))}
-            </select>
-          </div>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-muted">Ainda não entregamos fora dessas 3 cidades.</p>
         </div>
 
         <button

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Política de Privacidade — Loja de Camisas",
+  title: "Política de Privacidade — LV Sports",
 };
 
 export default function PrivacidadePage() {
@@ -15,7 +15,7 @@ export default function PrivacidadePage() {
       <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted">
         <section>
           <p>
-            Esta página explica quais dados a Loja de Camisas coleta, pra que servem e com quem
+            Esta página explica quais dados a LV Sports coleta, pra que servem e com quem
             são compartilhados, conforme a Lei Geral de Proteção de Dados (LGPD). O responsável
             pelo tratamento dos seus dados é{" "}
             <strong className="text-paper">Victor Rodrigues Esteves</strong>, CPF{" "}

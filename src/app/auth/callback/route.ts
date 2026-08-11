@@ -8,21 +8,9 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient();
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (!error && data.user) {
-      const { data: perfil } = await supabase
-        .from("perfis")
-        .select("user_id")
-        .eq("user_id", data.user.id)
-        .maybeSingle();
-
-      if (!perfil) {
-        return NextResponse.redirect(
-          `${origin}/completar-cadastro?next=${encodeURIComponent(next)}`,
-        );
-      }
-
+    if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
   }

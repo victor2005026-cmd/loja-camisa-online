@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -32,8 +33,8 @@ export function Header() {
   return (
     <header className="sticky top-0 z-10 border-b border-line bg-ink/95 backdrop-blur">
       <div className="flex w-full items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <Link href="/" className="font-display text-lg uppercase tracking-wide text-paper">
-          Loja de Camisas
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/logo.png" alt="LV Sports" width={140} height={91} className="h-9 w-auto" priority />
         </Link>
 
         <div className="flex items-center gap-4">

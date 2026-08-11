@@ -12,25 +12,11 @@ export async function GET(request: NextRequest) {
 
   if (token_hash && type) {
     const supabase = await createClient();
-    const { data, error } = await supabase.auth.verifyOtp({ type, token_hash });
+    const { error } = await supabase.auth.verifyOtp({ type, token_hash });
 
     if (!error) {
       if (type === "recovery") {
         return NextResponse.redirect(`${origin}/redefinir-senha`);
-      }
-
-      if (data.user) {
-        const { data: perfil } = await supabase
-          .from("perfis")
-          .select("user_id")
-          .eq("user_id", data.user.id)
-          .maybeSingle();
-
-        if (!perfil) {
-          return NextResponse.redirect(
-            `${origin}/completar-cadastro?next=${encodeURIComponent(next)}`,
-          );
-        }
       }
 
       return NextResponse.redirect(`${origin}${next.startsWith("/") ? next : "/"}`);

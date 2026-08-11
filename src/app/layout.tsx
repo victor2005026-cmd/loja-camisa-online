@@ -27,18 +27,18 @@ const description = "Torcedor, retrô, player ou treino — direto pro seu guard
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Loja de Camisas",
+  title: "LV Sports",
   description,
   openGraph: {
-    title: "Loja de Camisas",
+    title: "LV Sports",
     description,
-    siteName: "Loja de Camisas",
+    siteName: "LV Sports",
     locale: "pt_BR",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Loja de Camisas",
+    title: "LV Sports",
     description,
   },
 };

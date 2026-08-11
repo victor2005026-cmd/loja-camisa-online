@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { CIDADES_ATENDIDAS } from "@/lib/types";
 
 export async function salvarPerfil(formData: FormData) {
   const supabase = await createClient();
@@ -20,10 +21,13 @@ export async function salvarPerfil(formData: FormData) {
   const complemento = formData.get("complemento")?.toString().trim() || null;
   const bairro = formData.get("bairro")?.toString().trim();
   const cidade = formData.get("cidade")?.toString().trim();
-  const estado = formData.get("estado")?.toString().trim();
 
-  if (!telefone || !cep || !rua || !numero || !bairro || !cidade || !estado) {
+  if (!telefone || !cep || !rua || !numero || !bairro || !cidade) {
     throw new Error("Preencha todos os campos obrigatórios.");
+  }
+
+  if (!CIDADES_ATENDIDAS.includes(cidade as (typeof CIDADES_ATENDIDAS)[number])) {
+    throw new Error("Por enquanto só entregamos em Santos, São Vicente e Praia Grande.");
   }
 
   const { error } = await supabase.from("perfis").upsert({
@@ -35,7 +39,7 @@ export async function salvarPerfil(formData: FormData) {
     complemento,
     bairro,
     cidade,
-    estado,
+    estado: "SP",
   });
 
   if (error) {

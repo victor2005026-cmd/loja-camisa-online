@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Termos de Uso — Loja de Camisas",
+  title: "Termos de Uso — LV Sports",
 };
 
 export default function TermosPage() {
@@ -14,7 +14,7 @@ export default function TermosPage() {
         <section>
           <h2 className="mb-2 text-base font-semibold text-paper">1. Quem somos</h2>
           <p>
-            A Loja de Camisas é operada por <strong className="text-paper">Victor Rodrigues Esteves</strong>,
+            A LV Sports é operada por <strong className="text-paper">Victor Rodrigues Esteves</strong>,
             CPF <strong className="text-paper">499.892.238-66</strong>, com sede em{" "}
             <strong className="text-paper">Santos/SP</strong>. Para contato, use{" "}
             <strong className="text-paper">WhatsApp (13) 99174-9391 ou Instagram @lv.sports013</strong>.

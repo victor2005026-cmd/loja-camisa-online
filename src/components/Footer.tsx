@@ -105,7 +105,7 @@ export function Footer() {
         <Image src="/logo.png" alt="LV Sports" width={140} height={91} className="h-14 w-auto" />
 
         <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted">
-          <span>© {new Date().getFullYear()} Loja de Camisas</span>
+          <span>© {new Date().getFullYear()} LV Sports</span>
         </div>
       </div>
     </footer>

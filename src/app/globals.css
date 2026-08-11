@@ -14,6 +14,11 @@
   --color-ouro: #c9a24a;
 }
 
+.font-display {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
 /* Trama sutil de tecido, usada só no hero do catálogo */
 .textura-tecido {
   background-image:

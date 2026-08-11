@@ -4,9 +4,8 @@ export const CATEGORIAS_DISPONIVEIS = [
   "Torcedor",
   "Retrô",
   "Player",
+  "Seleções",
   "Manga Longa",
-  "Feminina",
-  "Regata",
   "Infantil",
   "Básica",
 ] as const;

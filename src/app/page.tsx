@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { CATEGORIAS_DISPONIVEIS, type CamisaComTamanhos } from "@/lib/types";
+import { CATEGORIAS_DISPONIVEIS, type CamisaComDetalhes } from "@/lib/types";
 import { ShirtPlaceholder } from "@/components/ShirtPlaceholder";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +16,7 @@ export default async function HomePage({
   let query = supabase
     .from("camisas")
     .select(
-      "id, modelo, descricao, preco, foto_url, categoria, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque)",
+      "id, modelo, descricao, preco, foto_url, categoria, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque), camisa_fotos(id, camisa_id, url, ordem)",
     )
     .eq("ativo", true)
     .order("created_at", { ascending: false });
@@ -25,7 +25,7 @@ export default async function HomePage({
     query = query.eq("categoria", categoria);
   }
 
-  const { data: camisas, error } = await query.returns<CamisaComTamanhos[]>();
+  const { data: camisas, error } = await query.returns<CamisaComDetalhes[]>();
 
   const disponiveis = (camisas ?? []).filter((c) =>
     c.camisa_tamanhos.some((t) => t.estoque > 0),
@@ -45,10 +45,10 @@ export default async function HomePage({
       </div>
 
       <div className="px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
+        <div className="mb-6 flex flex-wrap gap-2">
           <Link
             href="/"
-            className={`flex-shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition ${
+            className={`min-w-[110px] flex-1 rounded-full border px-4 py-2 text-center text-sm font-medium transition ${
               !categoria
                 ? "border-flare bg-flare text-ink"
                 : "border-line text-muted hover:border-muted hover:text-paper"
@@ -60,7 +60,7 @@ export default async function HomePage({
             <Link
               key={cat}
               href={`/?categoria=${encodeURIComponent(cat)}`}
-              className={`flex-shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition ${
+              className={`min-w-[110px] flex-1 rounded-full border px-4 py-2 text-center text-sm font-medium transition ${
                 categoria === cat
                   ? "border-flare bg-flare text-ink"
                   : "border-line text-muted hover:border-muted hover:text-paper"
@@ -87,20 +87,34 @@ export default async function HomePage({
               .filter((t) => t.estoque > 0)
               .map((t) => t.tamanho);
 
+            const fotoHover = [...camisa.camisa_fotos].sort((a, b) => a.ordem - b.ordem)[0]?.url;
+
             return (
               <Link
                 key={camisa.id}
                 href={`/produto/${camisa.id}`}
                 className="group flex flex-col overflow-hidden rounded-xl border border-line bg-surface transition-all duration-200 hover:-translate-y-1 hover:border-flare"
               >
-                <div className="aspect-square w-full">
+                <div className="relative aspect-square w-full overflow-hidden">
                   {camisa.foto_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={camisa.foto_url}
-                      alt={camisa.modelo}
-                      className="h-full w-full object-cover"
-                    />
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={camisa.foto_url}
+                        alt={camisa.modelo}
+                        className={`h-full w-full object-cover ${
+                          fotoHover ? "transition-opacity duration-300 group-hover:opacity-0" : ""
+                        }`}
+                      />
+                      {fotoHover && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={fotoHover}
+                          alt={`${camisa.modelo} - outro ângulo`}
+                          className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                        />
+                      )}
+                    </>
                   ) : (
                     <ShirtPlaceholder categoria={camisa.categoria} />
                   )}

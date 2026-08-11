@@ -24,10 +24,32 @@ export function ProductGallery({
 
   return (
     <div>
-      <div className="aspect-square w-full overflow-hidden rounded-xl bg-surface">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={fotos[selecionada]} alt={modelo} className="h-full w-full object-cover" />
-      </div>
+      <button
+        type="button"
+        onClick={() => setSelecionada((i) => (i + 1) % fotos.length)}
+        disabled={fotos.length < 2}
+        className="block aspect-square w-full overflow-hidden rounded-xl bg-surface disabled:cursor-default"
+        title={fotos.length > 1 ? "Clique pra ver a próxima foto" : undefined}
+      >
+        <div
+          className="flex h-full transition-transform duration-300 ease-out"
+          style={{
+            width: `${fotos.length * 100}%`,
+            transform: `translateX(-${(selecionada * 100) / fotos.length}%)`,
+          }}
+        >
+          {fotos.map((foto, i) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={foto}
+              src={foto}
+              alt={`${modelo} - foto ${i + 1}`}
+              className="h-full flex-shrink-0 object-cover"
+              style={{ width: `${100 / fotos.length}%` }}
+            />
+          ))}
+        </div>
+      </button>
 
       {fotos.length > 1 && (
         <div className="mt-3 flex gap-2">

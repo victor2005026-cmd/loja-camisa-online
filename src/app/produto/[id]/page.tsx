@@ -37,7 +37,8 @@ export default async function ProdutoPage({
         <ProductGallery fotos={fotos} modelo={camisa.modelo} categoria={camisa.categoria} />
 
         <div>
-          <span className="inline-block rounded border border-dashed border-line px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-muted">
+          <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted">
+            <span className="h-1.5 w-1.5 rounded-full bg-ouro" />
             {camisa.categoria}
           </span>
           <h1 className="mt-2 font-display text-2xl uppercase tracking-wide text-paper">{camisa.modelo}</h1>

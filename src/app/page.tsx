@@ -31,17 +31,47 @@ export default async function HomePage({
     c.camisa_tamanhos.some((t) => t.estoque > 0),
   );
 
+  const heroFoto = disponiveis.find((c) => c.foto_url)?.foto_url;
+
   return (
     <div className="w-full">
-      <div className="textura-tecido border-b border-line px-4 py-10 sm:px-6 lg:px-8">
-        <h1 className="font-display text-5xl uppercase leading-[0.92] tracking-tight text-paper sm:text-6xl">
-          Vista a
-          <br />
-          camisa.
-        </h1>
-        <p className="mt-3 max-w-md text-sm text-muted">
-          Torcedor, retrô, player ou treino — direto pro seu guarda-roupa.
-        </p>
+      <div className="relative flex min-h-[380px] flex-col justify-end overflow-hidden border-b border-line sm:min-h-[460px]">
+        {heroFoto ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={heroFoto}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/10" />
+          </>
+        ) : (
+          <div className="textura-tecido absolute inset-0 bg-gradient-to-br from-surface to-ink" />
+        )}
+
+        <div className="relative px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+          <h1 className="font-display text-5xl uppercase leading-[0.92] tracking-tight text-paper sm:text-6xl">
+            Vista a
+            <br />
+            camisa.
+          </h1>
+          <p className="mt-3 max-w-md text-sm text-muted">
+            Torcedor, retrô, player ou treino — direto pro seu guarda-roupa.
+          </p>
+          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] uppercase tracking-widest text-ouro">
+            <span>Entrega em Santos · São Vicente · Praia Grande</span>
+            <a
+              href="https://instagram.com/lv.sports013"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted transition hover:text-paper"
+            >
+              @lv.sports013
+            </a>
+          </div>
+        </div>
       </div>
 
       <div className="px-4 py-6 sm:px-6 lg:px-8">
@@ -50,7 +80,7 @@ export default async function HomePage({
             href="/"
             className={`min-w-[110px] flex-1 rounded-full border px-4 py-2 text-center text-sm font-medium transition ${
               !categoria
-                ? "border-flare bg-flare text-ink"
+                ? "border-ouro bg-ouro/10 text-ouro"
                 : "border-line text-muted hover:border-muted hover:text-paper"
             }`}
           >
@@ -62,7 +92,7 @@ export default async function HomePage({
               href={`/?categoria=${encodeURIComponent(cat)}`}
               className={`min-w-[110px] flex-1 rounded-full border px-4 py-2 text-center text-sm font-medium transition ${
                 categoria === cat
-                  ? "border-flare bg-flare text-ink"
+                  ? "border-ouro bg-ouro/10 text-ouro"
                   : "border-line text-muted hover:border-muted hover:text-paper"
               }`}
             >
@@ -93,7 +123,7 @@ export default async function HomePage({
               <Link
                 key={camisa.id}
                 href={`/produto/${camisa.id}`}
-                className="group flex flex-col overflow-hidden rounded-xl border border-line bg-surface transition-all duration-200 hover:-translate-y-1 hover:border-flare"
+                className="group flex flex-col overflow-hidden rounded-xl border border-line bg-surface transition-all duration-200 hover:-translate-y-1 hover:border-ouro hover:shadow-[0_12px_32px_-12px_rgba(201,162,74,0.35)]"
               >
                 <div className="relative aspect-square w-full overflow-hidden">
                   {camisa.foto_url ? (
@@ -120,7 +150,8 @@ export default async function HomePage({
                   )}
                 </div>
                 <div className="flex flex-1 flex-col gap-1.5 p-3">
-                  <span className="inline-block w-fit rounded border border-dashed border-line px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-muted">
+                  <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted">
+                    <span className="h-1.5 w-1.5 rounded-full bg-ouro" />
                     {camisa.categoria}
                   </span>
                   <h2 className="text-sm font-medium text-paper">{camisa.modelo}</h2>

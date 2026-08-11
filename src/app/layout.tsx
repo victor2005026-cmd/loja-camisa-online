@@ -49,7 +49,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} ${anton.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-ink text-paper">
+      <body className="min-h-full flex flex-col bg-ink font-sans text-paper">
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

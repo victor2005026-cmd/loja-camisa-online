@@ -24,7 +24,8 @@ export async function adicionarFotosHero(formData: FormData) {
     if (ordemAtual >= MAX_FOTOS_HERO) break;
 
     const url = await uploadFotoHero(admin, arquivo);
-    await admin.from("hero_fotos").insert({ url, ordem: ordemAtual });
+    const { error } = await admin.from("hero_fotos").insert({ url, ordem: ordemAtual });
+    if (error) throw new Error(`Não foi possível salvar a foto: ${error.message}`);
     ordemAtual += 1;
   }
 

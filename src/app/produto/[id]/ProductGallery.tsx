@@ -43,13 +43,7 @@ export function ProductGallery({
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={() => irPara((selecionada + 1) % fotos.length)}
-        disabled={fotos.length < 2}
-        className="group relative block aspect-square w-full overflow-hidden rounded-xl bg-surface disabled:cursor-default"
-        title={fotos.length > 1 ? "Clique pra ver a próxima foto" : undefined}
-      >
+      <div className="group relative aspect-square w-full overflow-hidden rounded-xl bg-surface">
         <div
           className="flex h-full transition-transform duration-300 ease-out"
           style={{
@@ -70,13 +64,44 @@ export function ProductGallery({
         </div>
 
         {fotos.length > 1 && (
-          <span className="pointer-events-none absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-ink/60 text-paper opacity-0 backdrop-blur transition-opacity duration-200 group-hover:opacity-100">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M9 18l6-6-6-6" />
-            </svg>
-          </span>
+          <>
+            <button
+              type="button"
+              onClick={() => irPara((selecionada - 1 + fotos.length) % fotos.length)}
+              aria-label="Foto anterior"
+              className="absolute inset-y-0 left-0 z-10 w-1/2"
+            />
+            <button
+              type="button"
+              onClick={() => irPara((selecionada + 1) % fotos.length)}
+              aria-label="Próxima foto"
+              className="absolute inset-y-0 right-0 z-10 w-1/2"
+            />
+
+            <span className="pointer-events-none absolute bottom-3 left-3 flex h-9 w-9 items-center justify-center rounded-full bg-ink/60 text-paper opacity-0 backdrop-blur transition-opacity duration-200 group-hover:opacity-100">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </span>
+            <span className="pointer-events-none absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-ink/60 text-paper opacity-0 backdrop-blur transition-opacity duration-200 group-hover:opacity-100">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </span>
+
+            <div className="pointer-events-none absolute inset-x-0 top-3 flex justify-center gap-1.5">
+              {fotos.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all ${
+                    i === selecionada ? "w-5 bg-ouro" : "w-1.5 bg-paper/40"
+                  }`}
+                />
+              ))}
+            </div>
+          </>
         )}
-      </button>
+      </div>
 
       {fotos.length > 1 && (
         <div className="mt-3 flex gap-2">

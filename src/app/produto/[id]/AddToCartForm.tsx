@@ -52,13 +52,18 @@ export function AddToCartForm({
                 setQuantidade(1);
                 setAdicionado(false);
               }}
-              className={`rounded-lg border px-3 py-1.5 font-display text-sm tracking-wide transition ${
+              className={`relative rounded-lg border px-3 py-1.5 font-display text-sm tracking-wide transition ${
                 tamanho === t.tamanho
                   ? "border-flare bg-flare text-ink"
                   : "border-line text-paper hover:border-muted"
               }`}
             >
               {t.tamanho}
+              {t.estoque <= 3 && (
+                <span className="absolute -right-1.5 -top-1.5 rounded-full bg-ouro px-1 font-mono text-[9px] font-bold text-ink">
+                  {t.estoque}
+                </span>
+              )}
             </button>
           ))}
         </div>

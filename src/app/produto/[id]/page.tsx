@@ -126,6 +126,59 @@ export default async function ProdutoPage({
               />
             </div>
           )}
+
+          <div className="mt-6 grid grid-cols-3 gap-2 border-y border-line py-4 text-center text-[11px] text-muted">
+            <div className="flex flex-col items-center gap-1">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6" className="text-ouro" aria-hidden="true">
+                <path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6l-8-4Z" />
+                <path d="M9 12l2 2 4-4" />
+              </svg>
+              Pix seguro
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6" className="text-ouro" aria-hidden="true">
+                <rect x="1" y="7" width="15" height="10" rx="1.5" />
+                <path d="M16 10h3.5L22 13.5V17h-6" />
+                <circle cx="6" cy="18.5" r="1.6" />
+                <circle cx="17.5" cy="18.5" r="1.6" />
+              </svg>
+              Santos, SV e PG
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6" className="text-ouro" aria-hidden="true">
+                <path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-4.2-1.1L3 20l1.1-5.3A8.4 8.4 0 0 1 3 11.5 8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5Z" />
+              </svg>
+              Dúvidas no WhatsApp
+            </div>
+          </div>
+
+          <div className="mt-4 divide-y divide-line border-b border-line text-sm">
+            <details className="group py-3">
+              <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-paper">
+                Entrega e pagamento
+                <span className="text-muted transition group-open:rotate-45">+</span>
+              </summary>
+              <p className="mt-2 text-muted">
+                Pagamento só via Pix — depois de confirmarmos que caiu, combinamos a entrega pelo
+                WhatsApp com quem comprou. Entregamos em Santos, São Vicente e Praia Grande.
+              </p>
+            </details>
+            <details className="group py-3">
+              <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-paper">
+                Trocas e devolução
+                <span className="text-muted transition group-open:rotate-45">+</span>
+              </summary>
+              <p className="mt-2 text-muted">
+                Você pode desistir da compra em até 7 dias corridos após o recebimento, sem
+                precisar justificar, com reembolso integral — conforme o Código de Defesa do
+                Consumidor. Detalhes completos nos{" "}
+                <a href="/termos" className="text-ouro hover:underline">
+                  Termos de Uso
+                </a>
+                .
+              </p>
+            </details>
+          </div>
         </div>
       </div>
 

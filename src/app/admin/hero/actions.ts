@@ -6,47 +6,55 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { removerFotoStorage, uploadFotoHero } from "@/lib/supabase/storage";
 import { MAX_FOTOS_HERO } from "@/lib/types";
 
-export async function adicionarFotosHero(formData: FormData) {
-  await requireAdmin();
-  const admin = createAdminClient();
+type FotoPlanoItem = { kind: "existing"; id: string } | { kind: "new" };
 
-  const { count } = await admin
-    .from("hero_fotos")
-    .select("id", { count: "exact", head: true });
-
-  let ordemAtual = count ?? 0;
-
-  const arquivos = formData
-    .getAll("fotos")
-    .filter((f): f is File => f instanceof File && f.size > 0);
-
-  for (const arquivo of arquivos) {
-    if (ordemAtual >= MAX_FOTOS_HERO) break;
-
-    const url = await uploadFotoHero(admin, arquivo);
-    const { error } = await admin.from("hero_fotos").insert({ url, ordem: ordemAtual });
-    if (error) throw new Error(`Não foi possível salvar a foto: ${error.message}`);
-    ordemAtual += 1;
+function parseFotoPlano(formData: FormData): FotoPlanoItem[] {
+  try {
+    const bruto = JSON.parse(formData.get("hero_plano")?.toString() ?? "[]");
+    if (!Array.isArray(bruto)) return [];
+    return bruto.slice(0, MAX_FOTOS_HERO);
+  } catch {
+    return [];
   }
-
-  revalidatePath("/admin/hero");
-  revalidatePath("/");
 }
 
-export async function removerFotoHero(fotoId: string) {
+export async function salvarHero(formData: FormData) {
   await requireAdmin();
   const admin = createAdminClient();
 
-  const { data: foto } = await admin
-    .from("hero_fotos")
-    .select("id, url")
-    .eq("id", fotoId)
-    .maybeSingle();
+  const { data: fotosAtuais } = await admin.from("hero_fotos").select("id, url");
+  const urlPorIdExistente = new Map((fotosAtuais ?? []).map((f) => [f.id, f.url]));
 
-  if (!foto) return;
+  const plano = parseFotoPlano(formData);
+  const arquivosNovos = formData
+    .getAll("hero_novas")
+    .filter((f): f is File => f instanceof File && f.size > 0);
 
-  await removerFotoStorage(admin, foto.url);
-  await admin.from("hero_fotos").delete().eq("id", fotoId);
+  const resolvidos: string[] = [];
+  let proximoArquivo = 0;
+  for (const item of plano) {
+    if (item.kind === "existing") {
+      const url = urlPorIdExistente.get(item.id);
+      if (url) resolvidos.push(url);
+    } else {
+      const arquivo = arquivosNovos[proximoArquivo];
+      proximoArquivo += 1;
+      if (arquivo) resolvidos.push(await uploadFotoHero(admin, arquivo));
+    }
+  }
+
+  await admin.from("hero_fotos").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+  if (resolvidos.length > 0) {
+    await admin
+      .from("hero_fotos")
+      .insert(resolvidos.map((url, i) => ({ url, ordem: i })));
+  }
+
+  const urlsAntigas = new Set((fotosAtuais ?? []).map((f) => f.url));
+  const urlsNovas = new Set(resolvidos);
+  for (const urlAntiga of urlsAntigas) {
+    if (!urlsNovas.has(urlAntiga)) await removerFotoStorage(admin, urlAntiga);
+  }
 
   revalidatePath("/admin/hero");
   revalidatePath("/");

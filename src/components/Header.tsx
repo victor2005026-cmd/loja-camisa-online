@@ -25,8 +25,15 @@ export function Header() {
   }, []);
 
   useEffect(() => {
+    // Zona morta entre 50 e 120px: evita que o header pisque (esconde,
+    // reflow, o navegador reajusta o scroll, mostra de novo, repete).
     function aoRolar() {
-      setRolado(window.scrollY > 40);
+      setRolado((estavaRolado) => {
+        const y = window.scrollY;
+        if (y > 120) return true;
+        if (y < 50) return false;
+        return estavaRolado;
+      });
     }
     aoRolar();
     window.addEventListener("scroll", aoRolar, { passive: true });

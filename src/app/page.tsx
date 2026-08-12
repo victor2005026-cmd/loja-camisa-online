@@ -80,9 +80,13 @@ export default async function HomePage({
           <p className="mt-3 max-w-md text-sm text-muted">
             Torcedor, retrô, player ou treino — direto pro seu guarda-roupa.
           </p>
-          <p className="mt-5 font-mono text-[11px] uppercase tracking-widest text-ouro">
-            Entrega em Santos · São Vicente · Praia Grande
-          </p>
+          <div className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-ouro/50 bg-ink/40 px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest text-ouro backdrop-blur">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11Z" />
+              <circle cx="12" cy="10" r="2.4" />
+            </svg>
+            Santos · São Vicente · Praia Grande
+          </div>
         </div>
       </div>
 
@@ -102,22 +106,12 @@ export default async function HomePage({
           <Link
             href="/"
             className={`min-w-[110px] flex-1 rounded-full border px-4 py-2 text-center text-sm font-medium transition ${
-              !categoria && !promocao
+              !categoria
                 ? "border-ouro bg-ouro/10 text-ouro"
                 : "border-line text-muted hover:border-muted hover:text-paper"
             }`}
           >
             Todos
-          </Link>
-          <Link
-            href="/?promocao=1"
-            className={`min-w-[110px] flex-1 rounded-full border px-4 py-2 text-center text-sm font-medium transition ${
-              promocao
-                ? "border-flare bg-flare text-ink"
-                : "border-flare/50 text-flare hover:border-flare"
-            }`}
-          >
-            🔥 Promoções
           </Link>
           {CATEGORIAS_DISPONIVEIS.map((cat) => (
             <Link

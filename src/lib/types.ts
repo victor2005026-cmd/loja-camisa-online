@@ -73,6 +73,9 @@ export type CamisaComDetalhes = CamisaComTamanhos & {
 
 export const MAX_FOTOS_HERO = 5;
 
+// 1 capa + 5 extras
+export const MAX_FOTOS_PRODUTO = 6;
+
 export type HeroFoto = {
   id: string;
   url: string;

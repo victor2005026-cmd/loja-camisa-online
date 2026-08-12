@@ -5,9 +5,19 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/admin-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { removerFotoStorage, uploadFotoCamisa } from "@/lib/supabase/storage";
-import { TAMANHOS_DISPONIVEIS } from "@/lib/types";
+import { MAX_FOTOS_PRODUTO, TAMANHOS_DISPONIVEIS } from "@/lib/types";
 
-const MAX_FOTOS_EXTRA = 5;
+type FotoPlanoItem = { kind: "existing"; id: string } | { kind: "new" };
+
+function parseFotoPlano(formData: FormData): FotoPlanoItem[] {
+  try {
+    const bruto = JSON.parse(formData.get("fotos_plano")?.toString() ?? "[]");
+    if (!Array.isArray(bruto)) return [];
+    return bruto.slice(0, MAX_FOTOS_PRODUTO);
+  } catch {
+    return [];
+  }
+}
 
 function parseEstoque(formData: FormData, tamanho: string) {
   const n = Number(formData.get(`estoque_${tamanho}`));
@@ -49,20 +59,57 @@ export async function salvarCamisa(formData: FormData) {
 
   if (!camisaId) throw new Error("Não foi possível identificar o produto.");
 
-  const capa = formData.get("capa");
-  if (capa instanceof File && capa.size > 0) {
-    const fotoUrl = await uploadFotoCamisa(admin, camisaId, capa);
-    await admin.from("camisas").update({ foto_url: fotoUrl }).eq("id", camisaId);
+  const { data: camisaAtual } = await admin
+    .from("camisas")
+    .select("foto_url")
+    .eq("id", camisaId)
+    .maybeSingle();
+  const { data: fotosAtuais } = await admin
+    .from("camisa_fotos")
+    .select("id, url")
+    .eq("camisa_id", camisaId);
+
+  const urlPorIdExistente = new Map<string, string>();
+  if (camisaAtual?.foto_url) urlPorIdExistente.set("capa", camisaAtual.foto_url);
+  for (const foto of fotosAtuais ?? []) urlPorIdExistente.set(foto.id, foto.url);
+
+  const plano = parseFotoPlano(formData);
+  const arquivosNovos = formData
+    .getAll("fotos_novas")
+    .filter((f): f is File => f instanceof File && f.size > 0);
+
+  const resolvidos: string[] = [];
+  let proximoArquivo = 0;
+  for (const item of plano) {
+    if (item.kind === "existing") {
+      const url = urlPorIdExistente.get(item.id);
+      if (url) resolvidos.push(url);
+    } else {
+      const arquivo = arquivosNovos[proximoArquivo];
+      proximoArquivo += 1;
+      if (arquivo) resolvidos.push(await uploadFotoCamisa(admin, camisaId, arquivo));
+    }
   }
 
-  const fotosExtra = formData
-    .getAll("fotos_extra")
-    .filter((f): f is File => f instanceof File && f.size > 0)
-    .slice(0, MAX_FOTOS_EXTRA);
+  const novaCapa = resolvidos[0] ?? null;
+  const novasExtras = resolvidos.slice(1);
 
-  for (let i = 0; i < fotosExtra.length; i++) {
-    const url = await uploadFotoCamisa(admin, camisaId, fotosExtra[i]);
-    await admin.from("camisa_fotos").insert({ camisa_id: camisaId, url, ordem: i });
+  await admin.from("camisas").update({ foto_url: novaCapa }).eq("id", camisaId);
+
+  await admin.from("camisa_fotos").delete().eq("camisa_id", camisaId);
+  if (novasExtras.length > 0) {
+    await admin
+      .from("camisa_fotos")
+      .insert(novasExtras.map((url, i) => ({ camisa_id: camisaId, url, ordem: i })));
+  }
+
+  const urlsAntigas = new Set<string>([
+    ...(camisaAtual?.foto_url ? [camisaAtual.foto_url] : []),
+    ...(fotosAtuais ?? []).map((f) => f.url),
+  ]);
+  const urlsNovas = new Set(resolvidos);
+  for (const urlAntiga of urlsAntigas) {
+    if (!urlsNovas.has(urlAntiga)) await removerFotoStorage(admin, urlAntiga);
   }
 
   for (const tamanho of TAMANHOS_DISPONIVEIS) {
@@ -83,23 +130,4 @@ export async function alternarAtivo(id: string, ativo: boolean) {
   await admin.from("camisas").update({ ativo }).eq("id", id);
   revalidatePath("/admin/produtos");
   revalidatePath("/");
-}
-
-export async function removerFotoExtra(fotoId: string) {
-  await requireAdmin();
-  const admin = createAdminClient();
-
-  const { data: foto } = await admin
-    .from("camisa_fotos")
-    .select("id, camisa_id, url")
-    .eq("id", fotoId)
-    .maybeSingle();
-
-  if (!foto) return;
-
-  await removerFotoStorage(admin, foto.url);
-  await admin.from("camisa_fotos").delete().eq("id", fotoId);
-
-  revalidatePath(`/admin/produtos/${foto.camisa_id}`);
-  revalidatePath(`/produto/${foto.camisa_id}`);
 }

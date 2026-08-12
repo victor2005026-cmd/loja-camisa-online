@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { CamisaComDetalhes } from "@/lib/types";
-import { removerFotoExtra, salvarCamisa } from "../actions";
+import { salvarCamisa } from "../actions";
 import { ProdutoForm } from "../ProdutoForm";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +23,7 @@ export default async function EditarProdutoPage({ params }: { params: Promise<{ 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <h1 className="mb-6 text-2xl font-bold">Editar produto</h1>
-      <ProdutoForm action={salvarCamisa} removerFoto={removerFotoExtra} camisa={camisa} />
+      <ProdutoForm action={salvarCamisa} camisa={camisa} />
     </div>
   );
 }

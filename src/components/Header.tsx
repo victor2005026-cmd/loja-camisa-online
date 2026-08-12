@@ -32,24 +32,15 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-10 border-b border-line bg-ink/95 backdrop-blur">
-      <div className="flex w-full items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.png" alt="LV Sports" width={140} height={91} className="h-9 w-auto" priority />
+      <div className="flex items-center justify-between gap-4 px-4 pt-4 sm:px-6 lg:px-8">
+        <Link href="/" className="flex flex-shrink-0 items-center gap-2">
+          <Image src="/logo.png" alt="LV Sports" width={140} height={91} className="h-10 w-auto" priority />
         </Link>
 
-        <div className="flex items-center gap-4">
-          <Link href="/carrinho" className="relative flex items-center gap-1.5 text-sm font-medium text-muted hover:text-paper">
-            <span>Carrinho</span>
-            {itemCount > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-flare px-1 font-display text-xs text-ink">
-                {itemCount}
-              </span>
-            )}
-          </Link>
-
+        <div className="flex flex-shrink-0 items-center gap-3">
           {user ? (
             <div className="flex items-center gap-3">
-              <Link href="/pedidos" className="text-sm font-medium text-muted hover:text-paper">
+              <Link href="/pedidos" className="hidden text-sm font-medium text-muted hover:text-paper sm:inline">
                 Meus pedidos
               </Link>
               {user.user_metadata?.avatar_url && (
@@ -60,20 +51,58 @@ export function Header() {
                   className="h-7 w-7 rounded-full border border-line"
                 />
               )}
-              <button onClick={handleLogout} className="text-sm text-muted hover:text-paper">
+              <button onClick={handleLogout} className="hidden text-sm text-muted hover:text-paper sm:inline">
                 Sair
               </button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
               <GoogleLoginButton className="flex items-center gap-1.5 rounded-full bg-paper px-3.5 py-1.5 text-sm font-semibold text-ink shadow-md transition hover:brightness-95 hover:shadow-lg" />
-              <Link href="/entrar" className="text-sm font-medium text-muted hover:text-paper">
+              <Link href="/entrar" className="hidden text-sm font-medium text-muted hover:text-paper sm:inline">
                 E-mail
               </Link>
             </div>
           )}
+
+          <Link
+            href="/carrinho"
+            aria-label="Carrinho"
+            className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-line text-paper transition hover:border-ouro"
+          >
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="19" cy="21" r="1" />
+              <path d="M2.5 3h2l2.6 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6" />
+            </svg>
+            {itemCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-flare px-1 font-display text-[11px] text-ink">
+                {itemCount}
+              </span>
+            )}
+          </Link>
         </div>
       </div>
+
+      <form action="/" role="search" className="px-4 pb-4 pt-3 sm:px-6 lg:px-8">
+        <div className="relative mx-auto max-w-xl">
+          <input
+            type="text"
+            name="busca"
+            placeholder="Buscar camisa, time, seleção..."
+            className="w-full rounded-full border border-line bg-surface px-4 py-2 pr-10 text-sm text-paper placeholder:text-muted focus:border-ouro focus:outline-none"
+          />
+          <button
+            type="submit"
+            aria-label="Buscar"
+            className="absolute right-1 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted hover:text-ouro"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="M21 21l-4.3-4.3" />
+            </svg>
+          </button>
+        </div>
+      </form>
     </header>
   );
 }

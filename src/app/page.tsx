@@ -9,9 +9,9 @@ export const dynamic = "force-dynamic";
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ categoria?: string }>;
+  searchParams: Promise<{ categoria?: string; busca?: string }>;
 }) {
-  const { categoria } = await searchParams;
+  const { categoria, busca } = await searchParams;
   const supabase = await createClient();
 
   let query = supabase
@@ -24,6 +24,10 @@ export default async function HomePage({
 
   if (categoria) {
     query = query.eq("categoria", categoria);
+  }
+
+  if (busca) {
+    query = query.or(`modelo.ilike.%${busca}%,descricao.ilike.%${busca}%`);
   }
 
   const { data: camisas, error } = await query.returns<CamisaComDetalhes[]>();
@@ -79,6 +83,17 @@ export default async function HomePage({
       </div>
 
       <div className="px-4 py-6 sm:px-6 lg:px-8">
+        {busca && (
+          <div className="mb-4 flex items-center gap-2 text-sm text-muted">
+            <span>
+              Resultado pra <strong className="text-paper">&quot;{busca}&quot;</strong>
+            </span>
+            <Link href="/" className="text-ouro hover:underline">
+              limpar
+            </Link>
+          </div>
+        )}
+
         <div className="mb-6 flex flex-wrap gap-2">
           <Link
             href="/"
@@ -112,7 +127,11 @@ export default async function HomePage({
         )}
 
         {!error && disponiveis.length === 0 && (
-          <p className="text-muted">Nenhuma camisa disponível nessa categoria no momento.</p>
+          <p className="text-muted">
+            {busca
+              ? `Nenhuma camisa encontrada pra "${busca}".`
+              : "Nenhuma camisa disponível nessa categoria no momento."}
+          </p>
         )}
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">

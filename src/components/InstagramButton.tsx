@@ -16,22 +16,26 @@ export function InstagramButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Seguir no Instagram"
-      className={`fixed right-5 z-20 flex h-14 w-14 items-center justify-center rounded-full border border-line bg-surface text-paper shadow-lg transition hover:border-ouro hover:text-ouro ${
+      className={`fixed right-5 z-20 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition hover:brightness-110 ${
         cartBarVisivel ? "bottom-40" : "bottom-24"
       }`}
+      style={{
+        background:
+          "radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)",
+      }}
     >
       <svg
         viewBox="0 0 24 24"
-        width="22"
-        height="22"
+        width="24"
+        height="24"
         fill="none"
-        stroke="currentColor"
+        stroke="white"
         strokeWidth="1.8"
         aria-hidden="true"
       >
         <rect x="3" y="3" width="18" height="18" rx="5" />
         <circle cx="12" cy="12" r="4" />
-        <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+        <circle cx="17.2" cy="6.8" r="1" fill="white" stroke="none" />
       </svg>
     </a>
   );

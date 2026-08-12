@@ -141,7 +141,7 @@ export default function CarrinhoPage() {
         ) : (
           <div className="space-y-2 text-center">
             <p className="text-sm text-muted">Entre pra finalizar a compra.</p>
-            <GoogleLoginButton className="mx-auto flex items-center justify-center gap-2 rounded-lg border border-line bg-surface px-4 py-2.5 text-sm font-medium text-paper shadow-sm transition hover:border-ouro hover:shadow-[0_4px_20px_-6px_rgba(201,162,74,0.35)]" />
+            <GoogleLoginButton className="mx-auto flex items-center justify-center gap-2 rounded-full bg-paper px-5 py-2.5 text-sm font-semibold text-ink shadow-md transition hover:brightness-95 hover:shadow-lg" />
             <Link href="/entrar?next=/carrinho" className="block text-xs text-muted hover:text-paper">
               ou entrar com e-mail
             </Link>

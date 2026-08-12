@@ -18,7 +18,7 @@ export function GoogleLoginButton({ className }: { className?: string }) {
       onClick={handleLogin}
       className={
         className ??
-        "flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+        "flex items-center justify-center gap-2 rounded-full bg-paper px-5 py-2.5 text-sm font-semibold text-ink shadow-md transition hover:brightness-95 hover:shadow-lg"
       }
     >
       <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">

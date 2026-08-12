@@ -66,7 +66,7 @@ export function Header() {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <GoogleLoginButton className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-paper transition hover:border-ouro" />
+              <GoogleLoginButton className="flex items-center gap-1.5 rounded-full bg-paper px-3.5 py-1.5 text-sm font-semibold text-ink shadow-md transition hover:brightness-95 hover:shadow-lg" />
               <Link href="/entrar" className="text-sm font-medium text-muted hover:text-paper">
                 E-mail
               </Link>

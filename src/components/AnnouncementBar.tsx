@@ -3,10 +3,10 @@
 import { usePathname } from "next/navigation";
 
 const ITENS = [
-  "ENTREGA EM SANTOS, SÃO VICENTE E PRAIA GRANDE",
-  "PAGAMENTO VIA PIX",
-  "DÚVIDAS? CHAMA NO WHATSAPP",
-  "@LV.SPORTS013",
+  "ENVIO PRA SANTOS, SÃO VICENTE E PRAIA GRANDE",
+  "PIX NA HORA, SEM COMPLICAÇÃO",
+  "CHAMA NO ZAP QUE A GENTE RESPONDE",
+  "SEGUE A GENTE: @LV.SPORTS013",
 ];
 
 export function AnnouncementBar() {

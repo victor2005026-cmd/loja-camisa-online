@@ -12,6 +12,7 @@ import { GoogleLoginButton } from "@/components/GoogleLoginButton";
 export function Header() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [rolado, setRolado] = useState(false);
   const itemCount = useCartStore((s) => s.items.reduce((n, i) => n + i.quantidade, 0));
 
   useEffect(() => {
@@ -23,6 +24,15 @@ export function Header() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    function aoRolar() {
+      setRolado(window.scrollY > 40);
+    }
+    aoRolar();
+    window.addEventListener("scroll", aoRolar, { passive: true });
+    return () => window.removeEventListener("scroll", aoRolar);
+  }, []);
+
   async function handleLogout() {
     const supabase = createClient();
     await supabase.auth.signOut();
@@ -32,58 +42,64 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-10 border-b border-line bg-ink/95 backdrop-blur">
-      <div className="flex items-center justify-between gap-4 px-4 pt-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex flex-shrink-0 items-center gap-2">
-          <Image src="/logo.png" alt="LV Sports" width={140} height={91} className="h-10 w-auto" priority />
-        </Link>
-
-        <div className="flex flex-shrink-0 items-center gap-3">
-          {user ? (
-            <div className="flex items-center gap-3">
-              <Link href="/pedidos" className="hidden text-sm font-medium text-muted hover:text-paper sm:inline">
-                Meus pedidos
-              </Link>
-              {user.user_metadata?.avatar_url && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={user.user_metadata.avatar_url}
-                  alt={user.user_metadata?.full_name ?? "Avatar"}
-                  className="h-7 w-7 rounded-full border border-line"
-                />
-              )}
-              <button onClick={handleLogout} className="hidden text-sm text-muted hover:text-paper sm:inline">
-                Sair
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <GoogleLoginButton className="flex items-center gap-1.5 rounded-full bg-paper px-3.5 py-1.5 text-sm font-semibold text-ink shadow-md transition hover:brightness-95 hover:shadow-lg" />
-              <Link href="/entrar" className="hidden text-sm font-medium text-muted hover:text-paper sm:inline">
-                E-mail
-              </Link>
-            </div>
-          )}
-
-          <Link
-            href="/carrinho"
-            aria-label="Carrinho"
-            className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-line text-paper transition hover:border-ouro"
-          >
-            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="9" cy="21" r="1" />
-              <circle cx="19" cy="21" r="1" />
-              <path d="M2.5 3h2l2.6 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6" />
-            </svg>
-            {itemCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-flare px-1 font-display text-[11px] text-ink">
-                {itemCount}
-              </span>
-            )}
+      <div
+        className={`overflow-hidden transition-[max-height,opacity] duration-300 ${
+          rolado ? "max-h-0 opacity-0" : "max-h-24 opacity-100"
+        }`}
+      >
+        <div className="flex items-center justify-between gap-4 px-4 pt-4 sm:px-6 lg:px-8">
+          <Link href="/" className="flex flex-shrink-0 items-center gap-2">
+            <Image src="/logo.png" alt="LV Sports" width={140} height={91} className="h-10 w-auto" priority />
           </Link>
+
+          <div className="flex flex-shrink-0 items-center gap-3">
+            {user ? (
+              <div className="flex items-center gap-3">
+                <Link href="/pedidos" className="hidden text-sm font-medium text-muted hover:text-paper sm:inline">
+                  Meus pedidos
+                </Link>
+                {user.user_metadata?.avatar_url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={user.user_metadata.avatar_url}
+                    alt={user.user_metadata?.full_name ?? "Avatar"}
+                    className="h-7 w-7 rounded-full border border-line"
+                  />
+                )}
+                <button onClick={handleLogout} className="hidden text-sm text-muted hover:text-paper sm:inline">
+                  Sair
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <GoogleLoginButton className="flex items-center gap-1.5 rounded-full bg-paper px-3.5 py-1.5 text-sm font-semibold text-ink shadow-md transition hover:brightness-95 hover:shadow-lg" />
+                <Link href="/entrar" className="hidden text-sm font-medium text-muted hover:text-paper sm:inline">
+                  E-mail
+                </Link>
+              </div>
+            )}
+
+            <Link
+              href="/carrinho"
+              aria-label="Carrinho"
+              className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-line text-paper transition hover:border-ouro"
+            >
+              <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="19" cy="21" r="1" />
+                <path d="M2.5 3h2l2.6 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6" />
+              </svg>
+              {itemCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-flare px-1 font-display text-[11px] text-ink">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
+          </div>
         </div>
       </div>
 
-      <form action="/" role="search" className="px-4 pb-4 pt-3 sm:px-6 lg:px-8">
+      <form action="/" role="search" className="px-4 pb-3 pt-3 sm:px-6 lg:px-8">
         <div className="relative mx-auto max-w-xl">
           <input
             type="text"

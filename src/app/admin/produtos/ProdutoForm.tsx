@@ -56,17 +56,31 @@ export function ProdutoForm({
         </select>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Preço (R$)</label>
-        <input
-          type="number"
-          step="0.01"
-          min={0}
-          name="preco"
-          defaultValue={camisa?.preco}
-          required
-          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-        />
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Preço (R$)</label>
+          <input
+            type="number"
+            step="0.01"
+            min={0}
+            name="preco"
+            defaultValue={camisa?.preco}
+            required
+            className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Preço promocional (opcional)</label>
+          <input
+            type="number"
+            step="0.01"
+            min={0}
+            name="preco_promocional"
+            defaultValue={camisa?.preco_promocional ?? ""}
+            placeholder="Deixe em branco pra não ter promoção"
+            className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+          />
+        </div>
       </div>
 
       <div>

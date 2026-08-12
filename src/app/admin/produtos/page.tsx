@@ -11,7 +11,7 @@ export default async function AdminProdutosPage() {
   const { data: camisas } = await admin
     .from("camisas")
     .select(
-      "id, modelo, descricao, preco, foto_url, categoria, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque)",
+      "id, modelo, descricao, preco, preco_promocional, foto_url, categoria, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque)",
     )
     .order("created_at", { ascending: false })
     .returns<CamisaComTamanhos[]>();

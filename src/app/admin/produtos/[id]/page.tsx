@@ -13,7 +13,7 @@ export default async function EditarProdutoPage({ params }: { params: Promise<{ 
   const { data: camisa } = await admin
     .from("camisas")
     .select(
-      "id, modelo, descricao, preco, foto_url, categoria, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque), camisa_fotos(id, camisa_id, url, ordem)",
+      "id, modelo, descricao, preco, preco_promocional, foto_url, categoria, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque), camisa_fotos(id, camisa_id, url, ordem)",
     )
     .eq("id", id)
     .maybeSingle<CamisaComDetalhes>();

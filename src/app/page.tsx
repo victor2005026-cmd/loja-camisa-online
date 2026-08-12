@@ -9,15 +9,15 @@ export const dynamic = "force-dynamic";
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ categoria?: string; busca?: string }>;
+  searchParams: Promise<{ categoria?: string; busca?: string; promocao?: string }>;
 }) {
-  const { categoria, busca } = await searchParams;
+  const { categoria, busca, promocao } = await searchParams;
   const supabase = await createClient();
 
   let query = supabase
     .from("camisas")
     .select(
-      "id, modelo, descricao, preco, foto_url, categoria, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque), camisa_fotos(id, camisa_id, url, ordem)",
+      "id, modelo, descricao, preco, preco_promocional, foto_url, categoria, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque), camisa_fotos(id, camisa_id, url, ordem)",
     )
     .eq("ativo", true)
     .order("created_at", { ascending: false });
@@ -28,6 +28,10 @@ export default async function HomePage({
 
   if (busca) {
     query = query.or(`modelo.ilike.%${busca}%,descricao.ilike.%${busca}%`);
+  }
+
+  if (promocao) {
+    query = query.not("preco_promocional", "is", null);
   }
 
   const { data: camisas, error } = await query.returns<CamisaComDetalhes[]>();
@@ -98,12 +102,22 @@ export default async function HomePage({
           <Link
             href="/"
             className={`min-w-[110px] flex-1 rounded-full border px-4 py-2 text-center text-sm font-medium transition ${
-              !categoria
+              !categoria && !promocao
                 ? "border-ouro bg-ouro/10 text-ouro"
                 : "border-line text-muted hover:border-muted hover:text-paper"
             }`}
           >
             Todos
+          </Link>
+          <Link
+            href="/?promocao=1"
+            className={`min-w-[110px] flex-1 rounded-full border px-4 py-2 text-center text-sm font-medium transition ${
+              promocao
+                ? "border-flare bg-flare text-ink"
+                : "border-flare/50 text-flare hover:border-flare"
+            }`}
+          >
+            🔥 Promoções
           </Link>
           {CATEGORIAS_DISPONIVEIS.map((cat) => (
             <Link
@@ -130,7 +144,9 @@ export default async function HomePage({
           <p className="text-muted">
             {busca
               ? `Nenhuma camisa encontrada pra "${busca}".`
-              : "Nenhuma camisa disponível nessa categoria no momento."}
+              : promocao
+                ? "Nenhuma camisa em promoção no momento."
+                : "Nenhuma camisa disponível nessa categoria no momento."}
           </p>
         )}
 

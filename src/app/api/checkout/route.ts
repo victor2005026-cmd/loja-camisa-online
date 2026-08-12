@@ -48,7 +48,7 @@ export async function POST(request: Request) {
   const camisaIds = [...new Set(itens.map((i) => i.camisaId))];
   const { data: camisas, error: camisasError } = await admin
     .from("camisas")
-    .select("id, modelo, descricao, preco, foto_url, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque)")
+    .select("id, modelo, descricao, preco, preco_promocional, foto_url, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque)")
     .in("id", camisaIds)
     .eq("ativo", true)
     .returns<CamisaComTamanhos[]>();
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const precoUnitario = camisa.preco;
+    const precoUnitario = camisa.preco_promocional ?? camisa.preco;
     valorTotal += precoUnitario * item.quantidade;
 
     pedidoItensParaInserir.push({

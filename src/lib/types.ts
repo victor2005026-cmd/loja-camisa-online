@@ -43,6 +43,7 @@ export type Camisa = {
   modelo: string;
   descricao: string | null;
   preco: number;
+  preco_promocional: number | null;
   foto_url: string | null;
   categoria: string;
   ativo: boolean;

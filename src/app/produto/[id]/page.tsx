@@ -16,7 +16,7 @@ const getCamisa = cache(async (id: string) => {
   const { data } = await supabase
     .from("camisas")
     .select(
-      "id, modelo, descricao, preco, foto_url, categoria, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque), camisa_fotos(id, camisa_id, url, ordem)",
+      "id, modelo, descricao, preco, preco_promocional, foto_url, categoria, ativo, created_at, camisa_tamanhos(id, camisa_id, tamanho, estoque), camisa_fotos(id, camisa_id, url, ordem)",
     )
     .eq("id", id)
     .eq("ativo", true)
@@ -76,7 +76,7 @@ export default async function ProdutoPage({
       "@type": "Offer",
       url: `${siteUrl}/produto/${camisa.id}`,
       priceCurrency: "BRL",
-      price: camisa.preco,
+      price: camisa.preco_promocional ?? camisa.preco,
       availability:
         tamanhos.length > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
     },
@@ -98,21 +98,33 @@ export default async function ProdutoPage({
             {camisa.categoria}
           </span>
           <h1 className="mt-2 font-display text-2xl uppercase tracking-wide text-paper">{camisa.modelo}</h1>
-          <p className="mt-1 font-display text-3xl text-flare">
-            {camisa.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-          </p>
+          <div className="mt-1 flex items-baseline gap-2">
+            {camisa.preco_promocional != null && (
+              <span className="text-base text-muted line-through">
+                {camisa.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+              </span>
+            )}
+            <p className="font-display text-3xl text-flare">
+              {(camisa.preco_promocional ?? camisa.preco).toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </p>
+          </div>
           {camisa.descricao && <p className="mt-3 text-sm text-muted">{camisa.descricao}</p>}
 
           {tamanhos.length === 0 ? (
             <p className="mt-6 text-sm font-medium text-red-400">Sem estoque disponível.</p>
           ) : (
-            <AddToCartForm
-              camisaId={camisa.id}
-              modelo={camisa.modelo}
-              fotoUrl={camisa.foto_url}
-              preco={camisa.preco}
-              tamanhos={tamanhos}
-            />
+            <div id="comprar" className="scroll-mt-28">
+              <AddToCartForm
+                camisaId={camisa.id}
+                modelo={camisa.modelo}
+                fotoUrl={camisa.foto_url}
+                preco={camisa.preco_promocional ?? camisa.preco}
+                tamanhos={tamanhos}
+              />
+            </div>
           )}
         </div>
       </div>

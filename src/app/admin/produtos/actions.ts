@@ -32,6 +32,8 @@ export async function salvarCamisa(formData: FormData) {
   const modelo = formData.get("modelo")?.toString().trim();
   const descricao = formData.get("descricao")?.toString().trim() || null;
   const preco = Number(formData.get("preco"));
+  const precoPromocionalBruto = formData.get("preco_promocional")?.toString().trim();
+  const precoPromocional = precoPromocionalBruto ? Number(precoPromocionalBruto) : null;
   const categoria = formData.get("categoria")?.toString().trim() || "Torcedor";
   const ativo = formData.get("ativo") === "on";
 
@@ -39,18 +41,22 @@ export async function salvarCamisa(formData: FormData) {
     throw new Error("Dados inválidos.");
   }
 
+  if (precoPromocional !== null && (!Number.isFinite(precoPromocional) || precoPromocional >= preco)) {
+    throw new Error("O preço promocional precisa ser menor que o preço normal.");
+  }
+
   let camisaId = id;
 
   if (camisaId) {
     const { error } = await admin
       .from("camisas")
-      .update({ modelo, descricao, preco, categoria, ativo })
+      .update({ modelo, descricao, preco, preco_promocional: precoPromocional, categoria, ativo })
       .eq("id", camisaId);
     if (error) throw new Error("Não foi possível salvar o produto.");
   } else {
     const { data, error } = await admin
       .from("camisas")
-      .insert({ modelo, descricao, preco, categoria, ativo, foto_url: null })
+      .insert({ modelo, descricao, preco, preco_promocional: precoPromocional, categoria, ativo, foto_url: null })
       .select("id")
       .single();
     if (error || !data) throw new Error("Não foi possível criar o produto.");

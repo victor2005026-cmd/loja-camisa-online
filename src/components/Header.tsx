@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { useCartStore } from "@/lib/cart-store";
-import { GoogleLoginButton } from "@/components/GoogleLoginButton";
 
 export function Header() {
   const router = useRouter();
@@ -78,12 +77,12 @@ export function Header() {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <GoogleLoginButton className="flex items-center gap-1.5 rounded-full bg-paper px-3.5 py-1.5 text-sm font-semibold text-ink shadow-md transition hover:brightness-95 hover:shadow-lg" />
-                <Link href="/entrar" className="hidden text-sm font-medium text-muted hover:text-paper sm:inline">
-                  E-mail
-                </Link>
-              </div>
+              <Link
+                href="/entrar"
+                className="rounded-full bg-paper px-4 py-1.5 text-sm font-semibold text-ink shadow-md transition hover:brightness-95 hover:shadow-lg"
+              >
+                Entrar ou Cadastrar
+              </Link>
             )}
 
             <Link

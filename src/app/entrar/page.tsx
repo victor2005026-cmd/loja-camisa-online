@@ -95,7 +95,7 @@ export default function EntrarPage() {
         <div className="h-px flex-1 bg-line" />
       </div>
 
-      <GoogleLoginButton className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-line bg-surface px-4 py-2 text-sm font-medium text-paper hover:border-muted" />
+      <GoogleLoginButton className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-line bg-surface px-4 py-2.5 text-sm font-medium text-paper transition hover:border-ouro hover:shadow-[0_4px_20px_-6px_rgba(201,162,74,0.35)]" />
     </div>
   );
 }

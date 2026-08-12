@@ -28,7 +28,7 @@ export function ProductGallery({
         type="button"
         onClick={() => setSelecionada((i) => (i + 1) % fotos.length)}
         disabled={fotos.length < 2}
-        className="block aspect-square w-full overflow-hidden rounded-xl bg-surface disabled:cursor-default"
+        className="group relative block aspect-square w-full overflow-hidden rounded-xl bg-surface disabled:cursor-default"
         title={fotos.length > 1 ? "Clique pra ver a próxima foto" : undefined}
       >
         <div
@@ -49,6 +49,14 @@ export function ProductGallery({
             />
           ))}
         </div>
+
+        {fotos.length > 1 && (
+          <span className="pointer-events-none absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-ink/60 text-paper opacity-0 backdrop-blur transition-opacity duration-200 group-hover:opacity-100">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </span>
+        )}
       </button>
 
       {fotos.length > 1 && (

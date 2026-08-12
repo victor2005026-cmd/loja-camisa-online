@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Bricolage_Grotesque } from "next/font/google";
+import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { InstagramButton } from "@/components/InstagramButton";
 import { CartBar } from "@/components/CartBar";
 import "./globals.css";
 
@@ -22,7 +24,8 @@ const displayFont = Bricolage_Grotesque({
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-const description = "Torcedor, retrô, player ou treino — direto pro seu guarda-roupa. Pagamento via Pix.";
+const description =
+  "Camisas de futebol torcedor, retrô e player em Santos, São Vicente e Praia Grande. Pague com Pix e receba rapidinho.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -49,10 +52,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} ${displayFont.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-ink font-sans text-paper">
+        <AnnouncementBar />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
         <CartBar />
+        <InstagramButton />
         <WhatsAppButton />
       </body>
     </html>

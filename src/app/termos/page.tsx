@@ -17,7 +17,7 @@ export default function TermosPage() {
             A LV Sports é operada por <strong className="text-paper">Victor Rodrigues Esteves</strong>,
             CPF <strong className="text-paper">499.892.238-66</strong>, com sede em{" "}
             <strong className="text-paper">Santos/SP</strong>. Para contato, use{" "}
-            <strong className="text-paper">WhatsApp (13) 99174-9391 ou Instagram @lv.sports013</strong>.
+            <strong className="text-paper">WhatsApp (13) 99174-9391 ou Instagram @lvsports013</strong>.
           </p>
         </section>
 

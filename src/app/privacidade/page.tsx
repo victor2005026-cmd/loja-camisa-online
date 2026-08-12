@@ -20,7 +20,7 @@ export default function PrivacidadePage() {
             pelo tratamento dos seus dados é{" "}
             <strong className="text-paper">Victor Rodrigues Esteves</strong>, CPF{" "}
             <strong className="text-paper">499.892.238-66</strong>. Dúvidas ou pedidos sobre seus dados:{" "}
-            <strong className="text-paper">WhatsApp (13) 99174-9391 ou Instagram @lv.sports013</strong>.
+            <strong className="text-paper">WhatsApp (13) 99174-9391 ou Instagram @lvsports013</strong>.
           </p>
         </section>
 

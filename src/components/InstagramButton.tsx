@@ -12,7 +12,7 @@ export function InstagramButton() {
 
   return (
     <a
-      href="https://instagram.com/lv.sports013"
+      href="https://instagram.com/lvsports013"
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Seguir no Instagram"

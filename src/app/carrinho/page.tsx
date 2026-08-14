@@ -70,14 +70,17 @@ export default function CarrinhoPage() {
     }
   }
 
-  function mensagemWhatsApp() {
-    const linhas = items.map(
+  function linhasItens() {
+    return items.map(
       (i) => `• ${i.quantidade}x ${i.modelo} (${i.tamanho}) — ${i.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`,
     );
+  }
+
+  function mensagemWhatsAppForaDaArea() {
     return [
       "Olá! Quero fazer esse pedido, mas meu endereço fica fora da área de entrega automática:",
       "",
-      ...linhas,
+      ...linhasItens(),
       "",
       `Total: ${total().toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`,
       foraDaArea ? `Endereço: ${foraDaArea.cidade}/${foraDaArea.estado}` : "",
@@ -86,6 +89,18 @@ export default function CarrinhoPage() {
     ]
       .filter(Boolean)
       .join("\n");
+  }
+
+  function mensagemWhatsAppNormal() {
+    return [
+      "Olá! Quero fazer esse pedido:",
+      "",
+      ...linhasItens(),
+      "",
+      `Total: ${total().toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`,
+      "",
+      "Pode me ajudar a fechar?",
+    ].join("\n");
   }
 
   if (items.length === 0) {
@@ -170,7 +185,7 @@ export default function CarrinhoPage() {
               Fala com a gente no WhatsApp com seu pedido que a gente vê o melhor jeito de enviar.
             </p>
             <a
-              href={`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensagemWhatsApp())}`}
+              href={`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensagemWhatsAppForaDaArea())}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] px-5 py-3 text-sm font-semibold text-white hover:brightness-110"
@@ -182,13 +197,23 @@ export default function CarrinhoPage() {
             </button>
           </div>
         ) : (
-          <button
-            onClick={handleCheckout}
-            disabled={loading}
-            className="w-full rounded-lg bg-flare px-5 py-3 text-sm font-semibold text-ink hover:brightness-110 disabled:opacity-50"
-          >
-            {loading ? "Redirecionando para pagamento..." : "Finalizar compra"}
-          </button>
+          <div className="space-y-2">
+            <button
+              onClick={handleCheckout}
+              disabled={loading}
+              className="w-full rounded-lg bg-flare px-5 py-3 text-sm font-semibold text-ink hover:brightness-110 disabled:opacity-50"
+            >
+              {loading ? "Redirecionando para pagamento..." : "Finalizar compra com Pix"}
+            </button>
+            <a
+              href={`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensagemWhatsAppNormal())}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-center text-xs text-muted hover:text-paper"
+            >
+              ou finalizar pelo WhatsApp
+            </a>
+          </div>
         ) : (
           <div className="space-y-2 text-center">
             <p className="text-sm text-muted">Entre pra finalizar a compra.</p>

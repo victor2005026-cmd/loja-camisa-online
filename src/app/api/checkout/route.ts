@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { expirarPedidosVencidos } from "@/lib/expirar-pedidos";
-import type { CamisaComTamanhos } from "@/lib/types";
+import { notificarNovoPedido } from "@/lib/notificar-pedido";
+import { CIDADES_ATENDIDAS, type CamisaComTamanhos } from "@/lib/types";
 
 type ItemRequest = {
   camisaId: string;
@@ -28,6 +29,22 @@ export async function POST(request: Request) {
   if (!perfil) {
     return NextResponse.json(
       { error: "Complete seu cadastro (telefone e endereço) antes de finalizar a compra.", redirectTo: "/completar-cadastro" },
+      { status: 400 },
+    );
+  }
+
+  const naAreaDeEntrega =
+    perfil.estado === "SP" &&
+    CIDADES_ATENDIDAS.includes(perfil.cidade as (typeof CIDADES_ATENDIDAS)[number]);
+
+  if (!naAreaDeEntrega) {
+    return NextResponse.json(
+      {
+        error: "Ainda não entregamos automaticamente nessa cidade.",
+        foraDaArea: true,
+        cidade: perfil.cidade,
+        estado: perfil.estado,
+      },
       { status: 400 },
     );
   }
@@ -141,6 +158,18 @@ export async function POST(request: Request) {
       .eq("camisa_id", item.camisa_id)
       .eq("tamanho", item.tamanho);
   }
+
+  await notificarNovoPedido({
+    valorTotal,
+    telefone: perfil.telefone,
+    endereco: `${perfil.rua}, ${perfil.numero}${perfil.complemento ? ` - ${perfil.complemento}` : ""} - ${perfil.bairro}, ${perfil.cidade}/${perfil.estado}`,
+    itens: pedidoItensParaInserir.map((item) => ({
+      modelo: camisasById.get(item.camisa_id)!.modelo,
+      tamanho: item.tamanho,
+      quantidade: item.quantidade,
+      precoUnitario: item.preco_unitario,
+    })),
+  });
 
   return NextResponse.json({ pedidoId: pedido.id });
 }

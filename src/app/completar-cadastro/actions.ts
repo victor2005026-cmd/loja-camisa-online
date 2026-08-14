@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { CIDADES_ATENDIDAS } from "@/lib/types";
+import { ESTADOS_BRASIL } from "@/lib/types";
 
 export async function salvarPerfil(formData: FormData) {
   const supabase = await createClient();
@@ -21,15 +21,19 @@ export async function salvarPerfil(formData: FormData) {
   const complemento = formData.get("complemento")?.toString().trim() || null;
   const bairro = formData.get("bairro")?.toString().trim();
   const cidade = formData.get("cidade")?.toString().trim();
+  const estado = formData.get("estado")?.toString().trim().toUpperCase();
 
-  if (!telefone || !cep || !rua || !numero || !bairro || !cidade) {
+  if (!telefone || !cep || !rua || !numero || !bairro || !cidade || !estado) {
     throw new Error("Preencha todos os campos obrigatórios.");
   }
 
-  if (!CIDADES_ATENDIDAS.includes(cidade as (typeof CIDADES_ATENDIDAS)[number])) {
-    throw new Error("Por enquanto só entregamos em Santos, São Vicente e Praia Grande.");
+  if (!ESTADOS_BRASIL.includes(estado as (typeof ESTADOS_BRASIL)[number])) {
+    throw new Error("Selecione um estado válido.");
   }
 
+  // Qualquer cidade/estado pode se cadastrar e comprar — a área de entrega
+  // automática (Baixada Santista) só é checada na hora de fechar o pedido,
+  // em /api/checkout. Fora dela, o cliente é direcionado pro WhatsApp.
   const { error } = await supabase.from("perfis").upsert({
     user_id: user.id,
     telefone,
@@ -39,7 +43,7 @@ export async function salvarPerfil(formData: FormData) {
     complemento,
     bairro,
     cidade,
-    estado: "SP",
+    estado,
   });
 
   if (error) {

@@ -9,6 +9,8 @@ import { useCartStore } from "@/lib/cart-store";
 import { GoogleLoginButton } from "@/components/GoogleLoginButton";
 import { ShirtPlaceholder } from "@/components/ShirtPlaceholder";
 
+const NUMERO_WHATSAPP = "5513991749391";
+
 export default function CarrinhoPage() {
   const router = useRouter();
   const { items, updateQuantidade, removeItem, total, clear } = useCartStore();
@@ -16,6 +18,7 @@ export default function CarrinhoPage() {
   const [loadingUser, setLoadingUser] = useState(true);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [foraDaArea, setForaDaArea] = useState<{ cidade: string; estado: string } | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -27,6 +30,7 @@ export default function CarrinhoPage() {
 
   async function handleCheckout() {
     setErro(null);
+    setForaDaArea(null);
     setLoading(true);
     try {
       const res = await fetch("/api/checkout", {
@@ -48,6 +52,11 @@ export default function CarrinhoPage() {
           router.push(`${data.redirectTo}?next=${encodeURIComponent("/carrinho")}`);
           return;
         }
+        if (data.foraDaArea) {
+          setForaDaArea({ cidade: data.cidade, estado: data.estado });
+          setLoading(false);
+          return;
+        }
         setErro(data.error ?? "Não foi possível iniciar o pagamento.");
         setLoading(false);
         return;
@@ -59,6 +68,24 @@ export default function CarrinhoPage() {
       setErro("Erro de conexão. Tente novamente.");
       setLoading(false);
     }
+  }
+
+  function mensagemWhatsApp() {
+    const linhas = items.map(
+      (i) => `• ${i.quantidade}x ${i.modelo} (${i.tamanho}) — ${i.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`,
+    );
+    return [
+      "Olá! Quero fazer esse pedido, mas meu endereço fica fora da área de entrega automática:",
+      "",
+      ...linhas,
+      "",
+      `Total: ${total().toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`,
+      foraDaArea ? `Endereço: ${foraDaArea.cidade}/${foraDaArea.estado}` : "",
+      "",
+      "Conseguem me dizer como fica o envio?",
+    ]
+      .filter(Boolean)
+      .join("\n");
   }
 
   if (items.length === 0) {
@@ -130,7 +157,31 @@ export default function CarrinhoPage() {
       {erro && <p className="mt-4 rounded-lg bg-red-950 p-3 text-sm text-red-300">{erro}</p>}
 
       <div className="mt-6">
-        {loadingUser ? null : user ? (
+        {loadingUser ? null : user ? foraDaArea ? (
+          <div className="space-y-3 rounded-xl border border-line bg-surface p-4 text-center">
+            <p className="text-sm text-paper">
+              Ainda não entregamos automaticamente em{" "}
+              <strong>
+                {foraDaArea.cidade}/{foraDaArea.estado}
+              </strong>
+              .
+            </p>
+            <p className="text-xs text-muted">
+              Fala com a gente no WhatsApp com seu pedido que a gente vê o melhor jeito de enviar.
+            </p>
+            <a
+              href={`https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensagemWhatsApp())}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] px-5 py-3 text-sm font-semibold text-white hover:brightness-110"
+            >
+              Falar no WhatsApp
+            </a>
+            <button onClick={() => setForaDaArea(null)} className="text-xs text-muted hover:text-paper">
+              Voltar
+            </button>
+          </div>
+        ) : (
           <button
             onClick={handleCheckout}
             disabled={loading}

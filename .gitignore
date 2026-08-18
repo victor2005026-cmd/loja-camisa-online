@@ -37,6 +37,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# pastas locais de rascunho/prévia — nunca deve ir pro repo nem pro deploy
+/assets
+/public/preview
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

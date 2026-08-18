@@ -61,6 +61,15 @@ export function Header() {
           <Image src="/logo.png" alt="LV Sports" width={140} height={91} className="h-9 w-auto" priority />
         </Link>
 
+        <Link
+          href="/experiencia"
+          className={`hidden flex-shrink-0 font-mono text-xs uppercase tracking-widest text-muted transition hover:text-ouro sm:inline overflow-hidden ${
+            rolado ? "max-w-0 opacity-0" : "max-w-[120px] opacity-100"
+          }`}
+        >
+          A Camisa
+        </Link>
+
         <form action="/" role="search" className="min-w-0 flex-1">
           <div className="relative mx-auto max-w-xl">
             <input

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ESTADOS_BRASIL } from "@/lib/types";
+import { LogoutButton } from "@/components/LogoutButton";
 import { salvarPerfil } from "../completar-cadastro/actions";
 import { AlterarSenhaForm } from "./AlterarSenhaForm";
 
@@ -137,6 +138,10 @@ export default async function ContaPage() {
       <section className="mt-10 border-t border-line pt-8">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-paper">Alterar senha</h2>
         <AlterarSenhaForm />
+      </section>
+
+      <section className="mt-10 border-t border-line pt-8">
+        <LogoutButton className="text-sm font-medium text-red-400 hover:text-red-300" />
       </section>
     </div>
   );

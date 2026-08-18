@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { useCartStore } from "@/lib/cart-store";
+import { LogoutButton } from "@/components/LogoutButton";
 
 function IconPessoa() {
   return (
@@ -18,9 +18,9 @@ function IconPessoa() {
 }
 
 export function Header() {
-  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [rolado, setRolado] = useState(false);
+  const [avatarComErro, setAvatarComErro] = useState(false);
   const itemCount = useCartStore((s) => s.items.reduce((n, i) => n + i.quantidade, 0));
 
   useEffect(() => {
@@ -28,6 +28,7 @@ export function Header() {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      setAvatarComErro(false);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
@@ -47,13 +48,6 @@ export function Header() {
     window.addEventListener("scroll", aoRolar, { passive: true });
     return () => window.removeEventListener("scroll", aoRolar);
   }, []);
-
-  async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/");
-    router.refresh();
-  }
 
   return (
     <header className="sticky top-0 z-10 border-b border-line bg-ink/95 backdrop-blur">
@@ -99,12 +93,13 @@ export function Header() {
                 Meus pedidos
               </Link>
               <Link href="/conta" aria-label="Minha conta">
-                {user.user_metadata?.avatar_url ? (
+                {user.user_metadata?.avatar_url && !avatarComErro ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={user.user_metadata.avatar_url}
                     alt={user.user_metadata?.full_name ?? "Minha conta"}
-                    className="h-8 w-8 rounded-full border border-line transition hover:border-ouro"
+                    onError={() => setAvatarComErro(true)}
+                    className="h-8 w-8 rounded-full border border-line object-cover transition hover:border-ouro"
                   />
                 ) : (
                   <span className="flex h-8 w-8 items-center justify-center rounded-full border border-line text-muted transition hover:border-ouro hover:text-paper">
@@ -112,9 +107,7 @@ export function Header() {
                   </span>
                 )}
               </Link>
-              <button onClick={handleLogout} className="hidden text-sm text-muted hover:text-paper sm:inline">
-                Sair
-              </button>
+              <LogoutButton className="hidden text-sm text-muted hover:text-paper sm:inline" />
             </div>
           ) : (
             <Link

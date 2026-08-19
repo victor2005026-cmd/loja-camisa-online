@@ -5,9 +5,6 @@ export const CATEGORIAS_DISPONIVEIS = [
   "Retrô",
   "Player",
   "Seleções",
-  "Manga Longa",
-  "Infantil",
-  "Básica",
 ] as const;
 
 export type Categoria = (typeof CATEGORIAS_DISPONIVEIS)[number];

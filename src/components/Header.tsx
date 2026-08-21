@@ -61,14 +61,16 @@ export function Header() {
           <Image src="/logo.png" alt="LV Sports" width={140} height={91} className="h-9 w-auto" priority />
         </Link>
 
-        <Link
-          href="/experiencia"
-          className={`hidden flex-shrink-0 items-center border-b border-transparent pb-0.5 font-display text-xs uppercase tracking-wide text-ouro transition-[max-width,opacity,border-color] duration-300 hover:border-ouro sm:inline-flex overflow-hidden ${
-            rolado ? "max-w-0 opacity-0" : "max-w-[160px] opacity-100"
-          }`}
-        >
-          Vista a Camisa
-        </Link>
+        <div className="hidden w-44 flex-shrink-0 justify-center sm:flex">
+          <Link
+            href="/experiencia"
+            className={`items-center border-b border-transparent pb-0.5 font-display text-xs uppercase tracking-wide text-ouro transition-[max-width,opacity,border-color] duration-300 hover:border-ouro sm:inline-flex overflow-hidden ${
+              rolado ? "max-w-0 opacity-0" : "max-w-[160px] opacity-100"
+            }`}
+          >
+            Vista a Camisa
+          </Link>
+        </div>
 
         <form action="/" role="search" className="min-w-0 flex-1">
           <div className="relative mx-auto max-w-xl">

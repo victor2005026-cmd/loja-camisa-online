@@ -17,14 +17,6 @@ function IconPessoa() {
   );
 }
 
-function IconCamisa() {
-  return (
-    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M8 3 4 6v4h3v10h10V10h3V6l-4-3-3 2-3-2Z" />
-    </svg>
-  );
-}
-
 export function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [rolado, setRolado] = useState(false);
@@ -69,18 +61,19 @@ export function Header() {
           <Image src="/logo.png" alt="LV Sports" width={140} height={91} className="h-9 w-auto" priority />
         </Link>
 
-        <Link
-          href="/experiencia"
-          className={`hidden flex-shrink-0 items-center gap-1.5 font-display text-xs uppercase tracking-wide text-ouro transition-[max-width,opacity] duration-300 hover:brightness-125 sm:inline-flex overflow-hidden ${
-            rolado ? "max-w-0 opacity-0" : "max-w-[160px] opacity-100"
-          }`}
-        >
-          <IconCamisa />
-          Vista a Camisa
-        </Link>
+        <div className="hidden flex-1 justify-center sm:flex">
+          <Link
+            href="/experiencia"
+            className={`items-center font-display text-xs uppercase tracking-wide text-ouro transition-[max-width,opacity] duration-300 hover:brightness-125 sm:inline-flex overflow-hidden ${
+              rolado ? "max-w-0 opacity-0" : "max-w-[160px] opacity-100"
+            }`}
+          >
+            Vista a Camisa
+          </Link>
+        </div>
 
         <form action="/" role="search" className="min-w-0 flex-1">
-          <div className="relative max-w-xl">
+          <div className="relative mx-auto max-w-xl">
             <input
               type="text"
               name="busca"

@@ -142,20 +142,31 @@ export function ScrollCinema({ videoSrc }: { videoSrc: string }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-ink/30" />
 
-        <div ref={textoHeroRef} className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-          <h1 className="font-display text-5xl uppercase leading-[0.92] tracking-tight text-paper sm:text-7xl">
+        <div
+          ref={textoHeroRef}
+          className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:max-w-xl md:px-16"
+        >
+          <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-ouro/50 bg-ink/40 px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest text-ouro backdrop-blur">
+            Camisas oficiais · Grau 1:1
+          </div>
+          <h1 className="mt-4 font-display text-6xl uppercase leading-[0.9] tracking-tight text-paper sm:text-8xl">
             A Camisa
           </h1>
-          <p className="mt-3 font-mono text-xs uppercase tracking-widest text-ouro">
-            Cada detalhe, de perto
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted sm:text-base">
+            Cada detalhe visto de perto — o tecido, a costura, o escudo. É assim que a gente escolhe
+            o que vai pro seu guarda-roupa.
           </p>
-          {!reduzMovimento && (
-            <p ref={textoRolarRef} className="mt-10 flex items-center gap-1.5 text-xs text-muted">
-              Role pra explorar
-              <IconSeta />
-            </p>
-          )}
         </div>
+
+        {!reduzMovimento && (
+          <p
+            ref={textoRolarRef}
+            className="absolute bottom-10 left-1/2 flex -translate-x-1/2 items-center gap-1.5 text-xs uppercase tracking-widest text-muted"
+          >
+            Role pra explorar
+            <IconSeta />
+          </p>
+        )}
 
         {!reduzMovimento && (
           <div className="absolute right-4 top-1/2 hidden w-56 -translate-y-1/2 flex-col gap-3 sm:right-8 md:flex">
@@ -179,12 +190,19 @@ export function ScrollCinema({ videoSrc }: { videoSrc: string }) {
           </div>
         )}
 
-        <div ref={textoFinalRef} className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center opacity-0">
-          <h2 className="font-display text-3xl uppercase leading-[0.95] tracking-tight text-paper sm:text-5xl">
+        <div
+          ref={textoFinalRef}
+          className="absolute inset-0 flex flex-col justify-center px-6 opacity-0 sm:px-12 md:max-w-xl md:px-16"
+        >
+          <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-ouro/50 bg-ink/40 px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest text-ouro backdrop-blur">
+            Tecido · Costura · Acabamento
+          </div>
+          <h2 className="mt-4 font-display text-5xl uppercase leading-[0.92] tracking-tight text-paper sm:text-7xl">
             Feita pra jogar.
           </h2>
-          <p className="mt-3 max-w-md text-sm text-muted">
-            Tecido leve, caimento certo, acabamento que aguenta o jogo inteiro.
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted sm:text-base">
+            Tecido leve, caimento certo, acabamento que aguenta o jogo inteiro — não só a foto do
+            catálogo.
           </p>
         </div>
       </div>

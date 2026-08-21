@@ -63,11 +63,11 @@ export function Header() {
 
         <Link
           href="/experiencia"
-          className={`hidden flex-shrink-0 font-mono text-xs uppercase tracking-widest text-muted transition hover:text-ouro sm:inline overflow-hidden ${
-            rolado ? "max-w-0 opacity-0" : "max-w-[120px] opacity-100"
+          className={`hidden flex-shrink-0 items-center rounded-full border border-line px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest text-muted transition hover:border-ouro hover:text-ouro sm:inline-flex overflow-hidden ${
+            rolado ? "max-w-0 border-0 px-0 opacity-0" : "max-w-[160px] opacity-100"
           }`}
         >
-          A Camisa
+          Vista a Camisa
         </Link>
 
         <form action="/" role="search" className="min-w-0 flex-1">

@@ -80,7 +80,7 @@ export function Header() {
         </Link>
 
         <form action="/" role="search" className="min-w-0 flex-1">
-          <div className="relative mx-auto max-w-xl">
+          <div className="relative max-w-xl">
             <input
               type="text"
               name="busca"

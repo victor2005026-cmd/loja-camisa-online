@@ -151,7 +151,7 @@ export function ScrollCinema({ videoSrc }: { videoSrc: string }) {
             Camisas oficiais · Grau 1:1
           </div>
           <h1 className="mt-4 font-display text-6xl uppercase leading-[0.9] tracking-tight text-paper [text-shadow:0_4px_20px_rgba(0,0,0,0.6)] sm:text-8xl">
-            A Camisa
+            <span className="text-ouro">A</span> Camisa
           </h1>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-paper/80 [text-shadow:0_2px_12px_rgba(0,0,0,0.7)] sm:text-base">
             Cada detalhe visto de perto — o tecido, a costura, o escudo. É assim que a gente escolhe
@@ -199,7 +199,7 @@ export function ScrollCinema({ videoSrc }: { videoSrc: string }) {
             Tecido · Costura · Acabamento
           </div>
           <h2 className="mt-4 font-display text-5xl uppercase leading-[0.92] tracking-tight text-paper [text-shadow:0_4px_20px_rgba(0,0,0,0.6)] sm:text-7xl">
-            Feita pra jogar.
+            Feita pra jogar
           </h2>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-paper/80 [text-shadow:0_2px_12px_rgba(0,0,0,0.7)] sm:text-base">
             Tecido leve, caimento certo, acabamento que aguenta o jogo inteiro — não só a foto do

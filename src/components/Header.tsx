@@ -17,8 +17,17 @@ function IconPessoa() {
   );
 }
 
+function IconCamisa() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M8 3 4 6v4h3v10h10V10h3V6l-4-3-3 2-3-2Z" />
+    </svg>
+  );
+}
+
 export function Header() {
   const [user, setUser] = useState<User | null>(null);
+  const [rolado, setRolado] = useState(false);
   const [avatarComErro, setAvatarComErro] = useState(false);
   const itemCount = useCartStore((s) => s.items.reduce((n, i) => n + i.quantidade, 0));
 
@@ -32,17 +41,41 @@ export function Header() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    // Zona morta entre 50 e 120px: evita que o header pisque (esconde,
+    // reflow, o navegador reajusta o scroll, mostra de novo, repete).
+    function aoRolar() {
+      setRolado((estavaRolado) => {
+        const y = window.scrollY;
+        if (y > 120) return true;
+        if (y < 50) return false;
+        return estavaRolado;
+      });
+    }
+    aoRolar();
+    window.addEventListener("scroll", aoRolar, { passive: true });
+    return () => window.removeEventListener("scroll", aoRolar);
+  }, []);
+
   return (
-    <header className="border-b border-line bg-ink/95 backdrop-blur">
+    <header className="sticky top-0 z-10 border-b border-line bg-ink/95 backdrop-blur">
       <div className="flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex flex-shrink-0 items-center">
+        <Link
+          href="/"
+          className={`flex flex-shrink-0 items-center overflow-hidden transition-[max-width,opacity,margin] duration-300 ${
+            rolado ? "-mr-3 max-w-0 opacity-0" : "mr-0 max-w-[160px] opacity-100"
+          }`}
+        >
           <Image src="/logo.png" alt="LV Sports" width={140} height={91} className="h-9 w-auto" priority />
         </Link>
 
         <Link
           href="/experiencia"
-          className="hidden flex-shrink-0 items-center text-sm font-medium text-muted transition hover:text-paper sm:inline-flex"
+          className={`hidden flex-shrink-0 items-center gap-1.5 font-display text-xs uppercase tracking-wide text-ouro transition-[max-width,opacity] duration-300 hover:brightness-125 sm:inline-flex overflow-hidden ${
+            rolado ? "max-w-0 opacity-0" : "max-w-[160px] opacity-100"
+          }`}
         >
+          <IconCamisa />
           Vista a Camisa
         </Link>
 
@@ -67,7 +100,11 @@ export function Header() {
           </div>
         </form>
 
-        <div className="flex flex-shrink-0 items-center gap-3">
+        <div
+          className={`flex flex-shrink-0 items-center gap-3 overflow-hidden transition-[max-width,opacity,margin] duration-300 ${
+            rolado ? "-ml-3 max-w-0 opacity-0" : "ml-0 max-w-[280px] opacity-100"
+          }`}
+        >
           {user ? (
             <div className="flex items-center gap-3">
               <Link href="/pedidos" className="hidden text-sm font-medium text-muted hover:text-paper sm:inline">

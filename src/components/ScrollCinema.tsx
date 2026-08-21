@@ -141,6 +141,7 @@ export function ScrollCinema({ videoSrc }: { videoSrc: string }) {
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-ink/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/50 to-transparent" />
 
         <div
           ref={textoHeroRef}
@@ -149,10 +150,10 @@ export function ScrollCinema({ videoSrc }: { videoSrc: string }) {
           <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-ouro/50 bg-ink/40 px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest text-ouro backdrop-blur">
             Camisas oficiais · Grau 1:1
           </div>
-          <h1 className="mt-4 font-display text-6xl uppercase leading-[0.9] tracking-tight text-paper sm:text-8xl">
+          <h1 className="mt-4 font-display text-6xl uppercase leading-[0.9] tracking-tight text-paper [text-shadow:0_4px_20px_rgba(0,0,0,0.6)] sm:text-8xl">
             A Camisa
           </h1>
-          <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted sm:text-base">
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-paper/80 [text-shadow:0_2px_12px_rgba(0,0,0,0.7)] sm:text-base">
             Cada detalhe visto de perto — o tecido, a costura, o escudo. É assim que a gente escolhe
             o que vai pro seu guarda-roupa.
           </p>
@@ -197,10 +198,10 @@ export function ScrollCinema({ videoSrc }: { videoSrc: string }) {
           <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-ouro/50 bg-ink/40 px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest text-ouro backdrop-blur">
             Tecido · Costura · Acabamento
           </div>
-          <h2 className="mt-4 font-display text-5xl uppercase leading-[0.92] tracking-tight text-paper sm:text-7xl">
+          <h2 className="mt-4 font-display text-5xl uppercase leading-[0.92] tracking-tight text-paper [text-shadow:0_4px_20px_rgba(0,0,0,0.6)] sm:text-7xl">
             Feita pra jogar.
           </h2>
-          <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted sm:text-base">
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-paper/80 [text-shadow:0_2px_12px_rgba(0,0,0,0.7)] sm:text-base">
             Tecido leve, caimento certo, acabamento que aguenta o jogo inteiro — não só a foto do
             catálogo.
           </p>

@@ -54,7 +54,7 @@ export function Header() {
       <div className="flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 lg:px-8">
         <Link
           href="/"
-          className={`flex flex-shrink-0 items-center overflow-hidden transition-[max-width,opacity,margin] duration-300 ${
+          className={`hidden flex-shrink-0 items-center overflow-hidden transition-[max-width,opacity,margin] duration-300 sm:flex ${
             rolado ? "-mr-3 max-w-0 opacity-0" : "mr-0 max-w-[160px] opacity-100"
           }`}
         >
@@ -120,12 +120,21 @@ export function Header() {
               <LogoutButton className="hidden text-sm text-muted hover:text-paper sm:inline" />
             </div>
           ) : (
-            <Link
-              href="/entrar"
-              className="rounded-full bg-paper px-4 py-1.5 text-sm font-semibold text-ink shadow-md transition hover:brightness-95 hover:shadow-lg"
-            >
-              Entrar ou Cadastrar
-            </Link>
+            <>
+              <Link
+                href="/entrar"
+                aria-label="Entrar ou Cadastrar"
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-line text-paper transition hover:border-ouro sm:hidden"
+              >
+                <IconPessoa />
+              </Link>
+              <Link
+                href="/entrar"
+                className="hidden rounded-full bg-paper px-4 py-1.5 text-sm font-semibold text-ink shadow-md transition hover:brightness-95 hover:shadow-lg sm:inline-block"
+              >
+                Entrar ou Cadastrar
+              </Link>
+            </>
           )}
 
           <Link

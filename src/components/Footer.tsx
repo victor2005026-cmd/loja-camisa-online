@@ -29,7 +29,7 @@ export function Footer() {
 
   return (
     <footer className="border-t border-line px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto grid max-w-6xl gap-8 sm:grid-cols-3">
+      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 sm:grid-cols-3">
         <div>
           <p className="text-xs font-medium uppercase tracking-widest text-muted">Institucional</p>
           <ul className="mt-3 space-y-2 text-sm">
@@ -72,7 +72,7 @@ export function Footer() {
           </ul>
         </div>
 
-        <div>
+        <div className="col-span-2 sm:col-span-1">
           <p className="text-xs font-medium uppercase tracking-widest text-muted">Atendimento</p>
           <ul className="mt-3 space-y-2 text-sm">
             <li>
@@ -101,10 +101,12 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="mx-auto mt-10 flex max-w-6xl flex-col items-center gap-4 border-t border-line pt-8">
-        <Image src="/logo.png" alt="LV Sports" width={140} height={91} className="h-14 w-auto" />
+      <div className="mx-auto mt-10 max-w-6xl border-t border-line pt-8">
+        <div className="flex justify-center">
+          <Image src="/logo.png" alt="LV Sports" width={140} height={91} className="h-14 w-auto" />
+        </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted">
+        <div className="mt-4 text-right text-xs text-muted">
           <span>© {new Date().getFullYear()} LV Sports</span>
         </div>
       </div>

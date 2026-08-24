@@ -17,6 +17,14 @@ function IconPessoa() {
   );
 }
 
+function IconCamisa() {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M8 3 4 6v4h3v10h10V10h3V6l-4-3-3 2-3-2Z" />
+    </svg>
+  );
+}
+
 export function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [rolado, setRolado] = useState(false);
@@ -59,6 +67,14 @@ export function Header() {
           }`}
         >
           <Image src="/logo.png" alt="LV Sports" width={140} height={91} className="h-9 w-auto" priority />
+        </Link>
+
+        <Link
+          href="/experiencia"
+          aria-label="Vista a Camisa"
+          className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-line text-ouro transition hover:border-ouro sm:hidden"
+        >
+          <IconCamisa />
         </Link>
 
         <Link

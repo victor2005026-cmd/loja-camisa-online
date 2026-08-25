@@ -165,12 +165,12 @@ export function ScrollCinema({
 
         <Link
           href="/"
-          aria-label="Voltar pro catálogo"
-          className="absolute left-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-line bg-ink/60 text-paper backdrop-blur transition hover:border-ouro sm:left-6 sm:top-6"
+          className="absolute left-4 top-4 z-20 flex items-center gap-1.5 rounded-full border border-line bg-ink/60 py-2 pl-3 pr-4 text-xs font-medium text-paper backdrop-blur transition hover:border-ouro sm:left-6 sm:top-6"
         >
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M15 18l-6-6 6-6" />
           </svg>
+          Voltar
         </Link>
 
         <div

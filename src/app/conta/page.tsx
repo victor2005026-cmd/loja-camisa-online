@@ -7,7 +7,12 @@ import { AlterarSenhaForm } from "./AlterarSenhaForm";
 
 export const dynamic = "force-dynamic";
 
-export default async function ContaPage() {
+export default async function ContaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ salvo?: string }>;
+}) {
+  const { salvo } = await searchParams;
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   const user = userData.user;
@@ -24,6 +29,12 @@ export default async function ContaPage() {
     <div className="mx-auto max-w-lg px-4 py-10">
       <h1 className="font-display text-2xl uppercase tracking-wide text-paper">Minha conta</h1>
       <p className="mt-1 text-sm text-muted">{user.email}</p>
+
+      {salvo === "1" && (
+        <p className="mt-4 rounded-lg border border-ouro/40 bg-ouro/10 px-4 py-2.5 text-sm text-ouro">
+          Dados salvos com sucesso.
+        </p>
+      )}
 
       <section className="mt-8">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-paper">Dados de entrega</h2>

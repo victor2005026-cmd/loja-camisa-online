@@ -66,5 +66,6 @@ export async function salvarPerfil(formData: FormData) {
     throw new Error("Não foi possível salvar seu cadastro. Tente novamente.");
   }
 
-  redirect(next.startsWith("/") ? next : "/");
+  const destino = next.startsWith("/") ? next : "/";
+  redirect(destino === "/conta" ? "/conta?salvo=1" : destino);
 }

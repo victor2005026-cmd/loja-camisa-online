@@ -2,7 +2,19 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { ESTADOS_BRASIL } from "@/lib/types";
+
+async function buscarCidadeEstadoPorCep(cep: string) {
+  const cepLimpo = cep.replace(/\D/g, "");
+  if (cepLimpo.length !== 8) return null;
+
+  const res = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+  if (!res.ok) return null;
+
+  const json = await res.json();
+  if (json.erro) return null;
+
+  return { cidade: json.localidade as string, estado: json.uf as string };
+}
 
 export async function salvarPerfil(formData: FormData) {
   const supabase = await createClient();
@@ -27,8 +39,12 @@ export async function salvarPerfil(formData: FormData) {
     throw new Error("Preencha todos os campos obrigatórios.");
   }
 
-  if (!ESTADOS_BRASIL.includes(estado as (typeof ESTADOS_BRASIL)[number])) {
-    throw new Error("Selecione um estado válido.");
+  const cepReal = await buscarCidadeEstadoPorCep(cep);
+  if (!cepReal) {
+    throw new Error("Não conseguimos validar esse CEP. Confira o número e tente de novo.");
+  }
+  if (cepReal.cidade !== cidade || cepReal.estado !== estado) {
+    throw new Error("Cidade/estado não conferem com o CEP informado.");
   }
 
   // Qualquer cidade/estado pode se cadastrar e comprar — a área de entrega

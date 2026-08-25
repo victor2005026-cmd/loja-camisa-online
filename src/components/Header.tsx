@@ -109,8 +109,8 @@ export function Header() {
         </form>
 
         <div
-          className={`flex flex-shrink-0 items-center gap-3 overflow-hidden transition-[max-width,opacity,margin] duration-300 ${
-            rolado ? "-ml-3 max-w-0 opacity-0" : "ml-0 max-w-[280px] opacity-100"
+          className={`flex flex-shrink-0 items-center gap-3 overflow-hidden py-1 pr-2 transition-[max-width,opacity,margin] duration-300 ${
+            rolado ? "-ml-3 max-w-0 opacity-0" : "ml-0 max-w-[290px] opacity-100"
           }`}
         >
           {user ? (

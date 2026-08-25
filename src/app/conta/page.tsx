@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { ESTADOS_BRASIL } from "@/lib/types";
 import { LogoutButton } from "@/components/LogoutButton";
 import { salvarPerfil } from "../completar-cadastro/actions";
+import { CamposEndereco } from "../completar-cadastro/CamposEndereco";
 import { AlterarSenhaForm } from "./AlterarSenhaForm";
 
 export const dynamic = "force-dynamic";
@@ -46,27 +46,13 @@ export default async function ContaPage() {
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-1">
-              <label className="block text-sm font-medium text-muted">CEP</label>
-              <input
-                name="cep"
-                required
-                defaultValue={perfil?.cep ?? ""}
-                placeholder="00000-000"
-                className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-paper placeholder:text-muted"
-              />
-            </div>
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-muted">Rua</label>
-              <input
-                name="rua"
-                required
-                defaultValue={perfil?.rua ?? ""}
-                className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-paper"
-              />
-            </div>
-          </div>
+          <CamposEndereco
+            cepInicial={perfil?.cep ?? ""}
+            ruaInicial={perfil?.rua ?? ""}
+            bairroInicial={perfil?.bairro ?? ""}
+            cidadeInicial={perfil?.cidade ?? ""}
+            estadoInicial={perfil?.estado ?? ""}
+          />
 
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-1">
@@ -86,43 +72,6 @@ export default async function ContaPage() {
                 placeholder="Apto, bloco... (opcional)"
                 className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-paper placeholder:text-muted"
               />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-muted">Bairro</label>
-            <input
-              name="bairro"
-              required
-              defaultValue={perfil?.bairro ?? ""}
-              className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-paper"
-            />
-          </div>
-
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-muted">Cidade</label>
-              <input
-                name="cidade"
-                required
-                defaultValue={perfil?.cidade ?? ""}
-                className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-paper"
-              />
-            </div>
-            <div className="col-span-1">
-              <label className="block text-sm font-medium text-muted">Estado</label>
-              <select
-                name="estado"
-                required
-                defaultValue={perfil?.estado ?? "SP"}
-                className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-paper"
-              >
-                {ESTADOS_BRASIL.map((uf) => (
-                  <option key={uf} value={uf}>
-                    {uf}
-                  </option>
-                ))}
-              </select>
             </div>
           </div>
 

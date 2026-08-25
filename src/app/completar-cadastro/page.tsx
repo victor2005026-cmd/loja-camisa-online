@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { ESTADOS_BRASIL } from "@/lib/types";
 import { salvarPerfil } from "./actions";
+import { CamposEndereco } from "./CamposEndereco";
 
 export const dynamic = "force-dynamic";
 
@@ -50,25 +50,7 @@ export default async function CompletarCadastroPage({
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
-          <div className="col-span-1">
-            <label className="block text-sm font-medium text-muted">CEP</label>
-            <input
-              name="cep"
-              required
-              placeholder="00000-000"
-              className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-paper placeholder:text-muted"
-            />
-          </div>
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-muted">Rua</label>
-            <input
-              name="rua"
-              required
-              className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-paper"
-            />
-          </div>
-        </div>
+        <CamposEndereco />
 
         <div className="grid grid-cols-3 gap-3">
           <div className="col-span-1">
@@ -89,40 +71,6 @@ export default async function CompletarCadastroPage({
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-muted">Bairro</label>
-          <input
-            name="bairro"
-            required
-            className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-paper"
-          />
-        </div>
-
-        <div className="grid grid-cols-3 gap-3">
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-muted">Cidade</label>
-            <input
-              name="cidade"
-              required
-              className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-paper"
-            />
-          </div>
-          <div className="col-span-1">
-            <label className="block text-sm font-medium text-muted">Estado</label>
-            <select
-              name="estado"
-              required
-              defaultValue="SP"
-              className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-paper"
-            >
-              {ESTADOS_BRASIL.map((uf) => (
-                <option key={uf} value={uf}>
-                  {uf}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
         <p className="text-xs text-muted">
           Fora de Santos, São Vicente e Praia Grande a gente combina o envio com você pelo
           WhatsApp na hora de fechar o pedido.

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ShirtPlaceholder } from "@/components/ShirtPlaceholder";
 
 const INTERVALO_AUTOPLAY_MS = 2800;
+const LIMIAR_ARRASTO_PX = 40;
 
 export function ProductGallery({
   fotos,
@@ -16,6 +17,7 @@ export function ProductGallery({
 }) {
   const [selecionada, setSelecionada] = useState(0);
   const [pausado, setPausado] = useState(false);
+  const toqueInicioX = useRef<number | null>(null);
 
   useEffect(() => {
     if (pausado || fotos.length < 2) return;
@@ -33,6 +35,23 @@ export function ProductGallery({
     setSelecionada(i);
   }
 
+  function aoTocarInicio(e: React.TouchEvent) {
+    toqueInicioX.current = e.touches[0].clientX;
+  }
+
+  function aoTocarFim(e: React.TouchEvent) {
+    if (toqueInicioX.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - toqueInicioX.current;
+    toqueInicioX.current = null;
+
+    if (Math.abs(deltaX) < LIMIAR_ARRASTO_PX) return;
+    if (deltaX < 0) {
+      irPara((selecionada + 1) % fotos.length);
+    } else {
+      irPara((selecionada - 1 + fotos.length) % fotos.length);
+    }
+  }
+
   if (fotos.length === 0) {
     return (
       <div className="aspect-square w-full overflow-hidden rounded-xl">
@@ -43,7 +62,11 @@ export function ProductGallery({
 
   return (
     <div>
-      <div className="group relative aspect-square w-full overflow-hidden rounded-xl bg-surface">
+      <div
+        className="group relative aspect-square w-full touch-pan-y overflow-hidden rounded-xl bg-surface"
+        onTouchStart={aoTocarInicio}
+        onTouchEnd={aoTocarFim}
+      >
         <div
           className="flex h-full transition-transform duration-300 ease-out"
           style={{

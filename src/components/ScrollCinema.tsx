@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 function IconEstrela() {
@@ -42,7 +43,13 @@ const CARTOES = [
   { Icone: IconMapa, titulo: "Entrega rápida", texto: "Santos, São Vicente e Praia Grande" },
 ];
 
-export function ScrollCinema({ videoSrc }: { videoSrc: string }) {
+export function ScrollCinema({
+  videoSrc,
+  videoSrcMobile,
+}: {
+  videoSrc: string;
+  videoSrcMobile?: string;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const textoHeroRef = useRef<HTMLDivElement>(null);
@@ -55,6 +62,7 @@ export function ScrollCinema({ videoSrc }: { videoSrc: string }) {
   const duracao = useRef(0);
 
   const [reduzMovimento, setReduzMovimento] = useState(false);
+  const [fonteVideo, setFonteVideo] = useState(videoSrc);
 
   useEffect(() => {
     function verificarPreferencia() {
@@ -64,8 +72,19 @@ export function ScrollCinema({ videoSrc }: { videoSrc: string }) {
   }, []);
 
   useEffect(() => {
+    function escolherFonte() {
+      const ehMobile = window.matchMedia("(max-width: 640px)").matches;
+      setFonteVideo(ehMobile && videoSrcMobile ? videoSrcMobile : videoSrc);
+    }
+    escolherFonte();
+  }, [videoSrc, videoSrcMobile]);
+
+  useEffect(() => {
     const video = videoRef.current;
     if (reduzMovimento || !video) return;
+
+    const ehMobile = window.matchMedia("(max-width: 640px)").matches;
+    let contadorFrame = 0;
 
     function aoCarregarMetadados() {
       duracao.current = video!.duration || 0;
@@ -89,7 +108,8 @@ export function ScrollCinema({ videoSrc }: { videoSrc: string }) {
       progressoAtual.current += (progressoAlvo.current - progressoAtual.current) * 0.15;
       const p = progressoAtual.current;
 
-      if (duracao.current > 0) {
+      contadorFrame++;
+      if (duracao.current > 0 && (!ehMobile || contadorFrame % 2 === 0)) {
         video!.currentTime = p * duracao.current;
       }
 
@@ -132,7 +152,7 @@ export function ScrollCinema({ videoSrc }: { videoSrc: string }) {
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-ink">
         <video
           ref={videoRef}
-          src={videoSrc}
+          src={fonteVideo}
           muted
           playsInline
           preload="auto"
@@ -142,6 +162,16 @@ export function ScrollCinema({ videoSrc }: { videoSrc: string }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-ink/30" />
         <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/50 to-transparent" />
+
+        <Link
+          href="/"
+          aria-label="Voltar pro catálogo"
+          className="absolute left-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-line bg-ink/60 text-paper backdrop-blur transition hover:border-ouro sm:left-6 sm:top-6"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </Link>
 
         <div
           ref={textoHeroRef}

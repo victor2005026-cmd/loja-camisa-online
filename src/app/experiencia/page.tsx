@@ -5,7 +5,10 @@ import { RevelarAoRolar } from "@/components/RevelarAoRolar";
 export default function ExperienciaPage() {
   return (
     <div>
-      <ScrollCinema videoSrc="/experiencia/camisa-video.mp4" />
+      <ScrollCinema
+        videoSrc="/experiencia/camisa-video.mp4"
+        videoSrcMobile="/experiencia/camisa-video-mobile.mp4"
+      />
 
       <section className="mx-auto max-w-2xl px-4 py-24 text-center">
         <RevelarAoRolar>

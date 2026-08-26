@@ -9,9 +9,9 @@ export const dynamic = "force-dynamic";
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ categoria?: string; busca?: string; promocao?: string }>;
+  searchParams: Promise<{ categoria?: string; busca?: string; promocao?: string; erro?: string }>;
 }) {
-  const { categoria, busca, promocao } = await searchParams;
+  const { categoria, busca, promocao, erro } = await searchParams;
   const supabase = await createClient();
 
   let query = supabase
@@ -91,6 +91,12 @@ export default async function HomePage({
       </div>
 
       <div className="px-4 py-6 sm:px-6 lg:px-8">
+        {erro === "login" && (
+          <div className="mb-4 rounded-lg bg-red-950 p-3 text-sm text-red-300">
+            Não foi possível entrar com o Google. Tenta de novo, ou entra com e-mail e senha.
+          </div>
+        )}
+
         {busca && (
           <div className="mb-4 flex items-center gap-2 text-sm text-muted">
             <span>

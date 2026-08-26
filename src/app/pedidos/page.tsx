@@ -17,7 +17,12 @@ const STATUS_COLOR: Record<string, string> = {
   cancelado: "bg-red-950 text-red-300",
 };
 
-export default async function PedidosPage() {
+export default async function PedidosPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  const { status } = await searchParams;
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
 
@@ -45,6 +50,12 @@ export default async function PedidosPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <h1 className="mb-6 font-display text-2xl uppercase tracking-wide text-paper">Meus pedidos</h1>
+
+      {status === "sucesso" && (
+        <div className="mb-4 rounded-lg bg-green-950 p-3 text-sm text-green-300">
+          Pagamento confirmado! Seu pedido já está marcado como pago.
+        </div>
+      )}
 
       {!pedidos || pedidos.length === 0 ? (
         <p className="text-muted">Você ainda não fez nenhum pedido.</p>

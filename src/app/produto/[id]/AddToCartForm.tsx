@@ -23,6 +23,7 @@ export function AddToCartForm({
   const [tamanho, setTamanho] = useState(tamanhos[0]?.tamanho ?? "");
   const [quantidade, setQuantidade] = useState(1);
   const [adicionado, setAdicionado] = useState(false);
+  const [noLimite, setNoLimite] = useState(false);
 
   const estoqueSelecionado = tamanhos.find((t) => t.tamanho === tamanho)?.estoque ?? 0;
 
@@ -76,10 +77,20 @@ export function AddToCartForm({
           min={1}
           max={estoqueSelecionado}
           value={quantidade}
-          onChange={(e) => setQuantidade(Math.max(1, Math.min(Number(e.target.value), estoqueSelecionado)))}
+          onChange={(e) => {
+            const digitado = Number(e.target.value);
+            if (digitado > estoqueSelecionado) {
+              setNoLimite(true);
+              setTimeout(() => setNoLimite(false), 3000);
+            }
+            setQuantidade(Math.max(1, Math.min(digitado, estoqueSelecionado)));
+          }}
           className="w-24 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm text-paper"
         />
         <span className="ml-2 text-xs text-muted">{estoqueSelecionado} em estoque</span>
+        {noLimite && (
+          <p className="mt-1 text-xs text-flare">Só temos {estoqueSelecionado} dessa camisa/tamanho</p>
+        )}
       </div>
 
       <div className="flex gap-3">

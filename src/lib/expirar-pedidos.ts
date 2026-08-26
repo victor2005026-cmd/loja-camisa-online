@@ -1,8 +1,16 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PEDIDO_EXPIRA_EM_MINUTOS } from "@/lib/pix";
+import { notificarPedidoExpirado } from "@/lib/notificar-pedido";
 
 type ItemEstoque = { camisa_id: string; tamanho: string; quantidade: number };
+
+type PedidoVencido = {
+  id: string;
+  user_id: string;
+  valor_total: number;
+  pedido_itens: (ItemEstoque & { camisas: { modelo: string } | null })[];
+};
 
 export async function devolverEstoque(admin: SupabaseClient, itens: ItemEstoque[]) {
   for (const item of itens) {
@@ -30,14 +38,30 @@ export async function expirarPedidosVencidos() {
 
   const { data: vencidos } = await admin
     .from("pedidos")
-    .select("id, pedido_itens(camisa_id, tamanho, quantidade)")
+    .select(
+      "id, user_id, valor_total, pedido_itens(camisa_id, tamanho, quantidade, camisas(modelo))",
+    )
     .eq("status", "aguardando_pagamento")
-    .lt("created_at", limite);
+    .lt("created_at", limite)
+    .returns<PedidoVencido[]>();
 
   if (!vencidos || vencidos.length === 0) return;
 
   for (const pedido of vencidos) {
     await devolverEstoque(admin, pedido.pedido_itens);
     await admin.from("pedidos").update({ status: "cancelado" }).eq("id", pedido.id);
+
+    const { data: userData } = await admin.auth.admin.getUserById(pedido.user_id);
+    if (userData.user?.email) {
+      await notificarPedidoExpirado({
+        email: userData.user.email,
+        valorTotal: pedido.valor_total,
+        itens: pedido.pedido_itens.map((item) => ({
+          modelo: item.camisas?.modelo ?? "Produto",
+          tamanho: item.tamanho,
+          quantidade: item.quantidade,
+        })),
+      });
+    }
   }
 }

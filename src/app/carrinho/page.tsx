@@ -19,6 +19,7 @@ export default function CarrinhoPage() {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [foraDaArea, setForaDaArea] = useState<{ cidade: string; estado: string } | null>(null);
+  const [itemNoLimite, setItemNoLimite] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -48,6 +49,14 @@ export default function CarrinhoPage() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (res.status === 401) {
+          // Sessão expirou entre carregar a página e finalizar a compra —
+          // atualiza o estado local pra mostrar a tela de login de novo.
+          setUser(null);
+          setErro("Sua sessão expirou. Entre de novo pra continuar.");
+          setLoading(false);
+          return;
+        }
         if (data.redirectTo) {
           router.push(`${data.redirectTo}?next=${encodeURIComponent("/carrinho")}`);
           return;
@@ -141,16 +150,27 @@ export default function CarrinhoPage() {
               </p>
             </div>
 
-            <input
-              type="number"
-              min={1}
-              max={item.estoqueDisponivel}
-              value={item.quantidade}
-              onChange={(e) =>
-                updateQuantidade(item.camisaId, item.tamanho, Number(e.target.value))
-              }
-              className="w-16 rounded-lg border border-line bg-ink px-2 py-1 text-sm text-paper"
-            />
+            <div>
+              <input
+                type="number"
+                min={1}
+                max={item.estoqueDisponivel}
+                value={item.quantidade}
+                onChange={(e) => {
+                  const chave = `${item.camisaId}-${item.tamanho}`;
+                  const digitado = Number(e.target.value);
+                  if (digitado > item.estoqueDisponivel) {
+                    setItemNoLimite(chave);
+                    setTimeout(() => setItemNoLimite((atual) => (atual === chave ? null : atual)), 3000);
+                  }
+                  updateQuantidade(item.camisaId, item.tamanho, digitado);
+                }}
+                className="w-16 rounded-lg border border-line bg-ink px-2 py-1 text-sm text-paper"
+              />
+              {itemNoLimite === `${item.camisaId}-${item.tamanho}` && (
+                <p className="mt-1 text-xs text-flare">Só temos {item.estoqueDisponivel} em estoque</p>
+              )}
+            </div>
 
             <button
               onClick={() => removeItem(item.camisaId, item.tamanho)}

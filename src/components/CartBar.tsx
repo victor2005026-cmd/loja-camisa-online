@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { useCartStore } from "@/lib/cart-store";
 
 export function CartBar() {
@@ -9,10 +10,12 @@ export function CartBar() {
   const items = useCartStore((s) => s.items);
   const total = useCartStore((s) => s.total());
   const itemCount = items.reduce((n, i) => n + i.quantidade, 0);
+  const [ocultoParaCount, setOcultoParaCount] = useState<number | null>(null);
 
   if (pathname?.startsWith("/admin")) return null;
   if (pathname === "/carrinho") return null;
   if (itemCount === 0) return null;
+  if (ocultoParaCount === itemCount) return null;
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-10 flex justify-center px-4 pb-4 sm:px-6">
@@ -42,12 +45,24 @@ export function CartBar() {
             </span>
           </span>
         </div>
-        <Link
-          href="/carrinho"
-          className="flex-shrink-0 rounded-full bg-flare px-4 py-2 text-sm font-semibold text-ink shadow-md transition hover:brightness-110"
-        >
-          Ver carrinho →
-        </Link>
+        <div className="flex flex-shrink-0 items-center gap-2">
+          <Link
+            href="/carrinho"
+            className="rounded-full bg-flare px-4 py-2 text-sm font-semibold text-ink shadow-md transition hover:brightness-110"
+          >
+            Ver carrinho →
+          </Link>
+          <button
+            type="button"
+            onClick={() => setOcultoParaCount(itemCount)}
+            aria-label="Fechar"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-muted transition hover:text-paper"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );

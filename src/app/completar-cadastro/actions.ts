@@ -7,13 +7,19 @@ async function buscarCidadeEstadoPorCep(cep: string) {
   const cepLimpo = cep.replace(/\D/g, "");
   if (cepLimpo.length !== 8) return null;
 
-  const res = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
-  if (!res.ok) return null;
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`, {
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return null;
 
-  const json = await res.json();
-  if (json.erro) return null;
+    const json = await res.json();
+    if (json.erro) return null;
 
-  return { cidade: json.localidade as string, estado: json.uf as string };
+    return { cidade: json.localidade as string, estado: json.uf as string };
+  } catch {
+    return null;
+  }
 }
 
 export async function salvarPerfil(formData: FormData) {

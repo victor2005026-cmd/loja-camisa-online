@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { GoogleLoginButton } from "@/components/GoogleLoginButton";
 
@@ -14,11 +14,29 @@ function traduzErro(mensagem: string) {
   return "Não foi possível entrar. Tente novamente.";
 }
 
+function erroDaUrlParaMensagem(erroUrl: string | null) {
+  if (erroUrl === "confirmacao") {
+    return "Esse link de confirmação expirou ou já foi usado. Peça um novo ou tente entrar normalmente.";
+  }
+  return null;
+}
+
 export default function EntrarPage() {
+  return (
+    <Suspense fallback={null}>
+      <EntrarForm />
+    </Suspense>
+  );
+}
+
+function EntrarForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [erro, setErro] = useState<string | null>(null);
+  const [erro, setErro] = useState<string | null>(() =>
+    erroDaUrlParaMensagem(searchParams.get("erro")),
+  );
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {

@@ -114,50 +114,35 @@ export async function POST(request: Request) {
     });
   }
 
-  const { data: pedido, error: pedidoError } = await admin
-    .from("pedidos")
-    .insert({
-      user_id: user.id,
-      status: "aguardando_pagamento",
-      valor_total: valorTotal,
-      forma_pagamento: "pix",
-      entrega_telefone: perfil.telefone,
-      entrega_rua: perfil.rua,
-      entrega_numero: perfil.numero,
-      entrega_complemento: perfil.complemento,
-      entrega_bairro: perfil.bairro,
-      entrega_cidade: perfil.cidade,
-      entrega_estado: perfil.estado,
-      entrega_cep: perfil.cep,
-    })
-    .select("id")
-    .single();
+  // Baixa de estoque + criação do pedido em uma única transação no banco,
+  // pra dois clientes não conseguirem comprar a última unidade ao mesmo tempo.
+  const { data: pedidoId, error: rpcError } = await admin.rpc("criar_pedido_com_estoque", {
+    p_user_id: user.id,
+    p_valor_total: valorTotal,
+    p_entrega_telefone: perfil.telefone,
+    p_entrega_rua: perfil.rua,
+    p_entrega_numero: perfil.numero,
+    p_entrega_complemento: perfil.complemento,
+    p_entrega_bairro: perfil.bairro,
+    p_entrega_cidade: perfil.cidade,
+    p_entrega_estado: perfil.estado,
+    p_entrega_cep: perfil.cep,
+    p_itens: pedidoItensParaInserir,
+  });
 
-  if (pedidoError || !pedido) {
+  if (rpcError) {
+    const match = /ESTOQUE_INSUFICIENTE:([^:]+):(.+)/.exec(rpcError.message);
+    if (match) {
+      const camisa = camisasById.get(match[1]);
+      return NextResponse.json(
+        { error: `Estoque insuficiente para ${camisa?.modelo ?? "esse produto"} (${match[2]}).` },
+        { status: 409 },
+      );
+    }
     return NextResponse.json({ error: "Não foi possível criar o pedido." }, { status: 500 });
   }
 
-  const { error: itensError } = await admin.from("pedido_itens").insert(
-    pedidoItensParaInserir.map((item) => ({ ...item, pedido_id: pedido.id })),
-  );
-
-  if (itensError) {
-    await admin.from("pedidos").delete().eq("id", pedido.id);
-    return NextResponse.json({ error: "Não foi possível registrar os itens do pedido." }, { status: 500 });
-  }
-
-  // Reserva o estoque (é devolvido automaticamente se o pedido expirar sem pagamento).
-  for (const item of pedidoItensParaInserir) {
-    const tamanhoInfo = camisasById
-      .get(item.camisa_id)!
-      .camisa_tamanhos.find((t) => t.tamanho === item.tamanho)!;
-
-    await admin
-      .from("camisa_tamanhos")
-      .update({ estoque: tamanhoInfo.estoque - item.quantidade })
-      .eq("camisa_id", item.camisa_id)
-      .eq("tamanho", item.tamanho);
-  }
+  const pedido = { id: pedidoId as string };
 
   await notificarNovoPedido({
     valorTotal,

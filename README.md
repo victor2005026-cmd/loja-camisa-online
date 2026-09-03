@@ -5,6 +5,13 @@ carrinho e pagamento real via Pix (chave própria, com QR Code e copia-e-cola).
 Stack: Next.js 16 (App Router) + TypeScript + Tailwind CSS + Supabase (banco,
 auth e storage).
 
+<img width="1918" height="870" alt="Captura de tela 2026-09-03 112046" src="https://github.com/user-attachments/assets/d845c231-2f91-4322-a1be-aa50c24d6954" />
+<img width="1917" height="861" alt="Captura de tela 2026-09-03 112737" src="https://github.com/user-attachments/assets/11f7aee2-41ab-4bad-89a4-f90e389443c0" />
+<img width="1919" height="861" alt="Captura de tela 2026-09-03 112722" src="https://github.com/user-attachments/assets/cedff97d-c413-4d4e-9c24-f70afc5dd4a1" />
+<img width="1911" height="791" alt="Captura de tela 2026-09-03 112611" src="https://github.com/user-attachments/assets/b7a3cd79-a4ae-4de2-876c-7c9d6ca07eab" />
+
+
+
 Este é um projeto **isolado**: usa seu próprio projeto Supabase, criado do
 zero, sem qualquer relação com outros sistemas ou tabelas que você já tenha.
 
